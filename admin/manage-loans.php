@@ -1,1 +1,1 @@
-<?php header('Location: credit-applications.php',true,302);exit;
+<?php require_once __DIR__.'/../includes/bootstrap.php';safeRedirect('credit-applications.php');

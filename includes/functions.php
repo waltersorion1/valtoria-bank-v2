@@ -31,6 +31,49 @@ function hasRole(string ...$roles): bool {
     return in_array(currentRole(), $roles, true);
 }
 
+function can(string $permission): bool {
+    $role = currentRole();
+    $permissions = [
+        'super_admin' => ['*'],
+        'operations' => ['dashboard.view','customers.view','customers.manage','cards.view','cards.manage','transactions.view','transactions.reverse','reconciliation.view','support.view','support.manage'],
+        'kyc_reviewer' => ['dashboard.view','customers.view','kyc.manage'],
+        'credit_officer' => ['dashboard.view','customers.view','credit.view','credit.manage'],
+        'support_agent' => ['dashboard.view','customers.view','support.view','support.manage'],
+        'read_only_auditor' => ['dashboard.view','customers.view','cards.view','transactions.view','credit.view','support.view','audit.view','reconciliation.view'],
+    ];
+    return in_array('*', $permissions[$role] ?? [], true)
+        || in_array($permission, $permissions[$role] ?? [], true);
+}
+
+function requirePermission(string $permission): void {
+    redirectIfNotLoggedIn();
+    if (!isAdmin() || !can($permission)) {
+        http_response_code(403);
+        exit('You do not have permission to perform this operation.');
+    }
+}
+
+function enforceSessionVersion(PDO $pdo): void {
+    if (!isLoggedIn()) return;
+    $stmt = $pdo->prepare('SELECT is_active,is_admin,role,session_version FROM users WHERE user_id=?');
+    $stmt->execute([(int)$_SESSION['user_id']]);
+    $user = $stmt->fetch();
+    $known = isset($_SESSION['session_version']) ? (int)$_SESSION['session_version'] : null;
+    if (!$user || !(int)$user['is_active'] || ($known !== null && $known !== (int)$user['session_version'])) {
+        $_SESSION=[];
+        if (session_status()===PHP_SESSION_ACTIVE) session_destroy();
+        safeRedirect('../login.php?error=session_invalid');
+    }
+    $_SESSION['session_version']=(int)$user['session_version'];
+    $_SESSION['is_admin']=(int)$user['is_admin'];
+    $_SESSION['role']=(string)$user['role'];
+}
+
+function audit(PDO $pdo, string $action, ?string $targetType = null, string|int|null $targetId = null, array $metadata = []): void {
+    $stmt = $pdo->prepare('INSERT INTO audit_logs(actor_user_id,action,target_type,target_id,metadata_json) VALUES(?,?,?,?,?)');
+    $stmt->execute([$_SESSION['user_id'] ?? null, $action, $targetType, $targetId === null ? null : (string)$targetId, $metadata ? json_encode($metadata, JSON_THROW_ON_ERROR) : null]);
+}
+
 // Add all other original functions here
 function redirectIfNotLoggedIn() {
     if (!isLoggedIn()) {
