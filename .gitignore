@@ -1,4 +1,5 @@
 .env
+PRIVATE_ADMIN_CREDENTIALS.md
 .module3-mariadb/
 .onboarding-mariadb/
 .onboarding-*.txt
