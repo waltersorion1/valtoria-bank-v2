@@ -106,3 +106,7 @@ Module 1: audit, configuration, PDO/session/error foundations, CSRF/validation/r
 Module 2 (requires explicit approval): integer-cents ledger, immutable transactions, cards/token metadata, provider/sandbox funding, beneficiaries and transfers, Visa eligibility/credit/repayments, statements, notifications, and reconciliation.
 
 Module 3 (requires explicit approval): complete operations console, granular permissions, audit coverage, support administration, security/authorization/upload review, accessibility/responsive QA, deployment readiness, and legacy cleanup.
+
+## Module 2 update
+
+The decimal `accounts.balance` and legacy `transactions` table remain compatibility/read-only structures. New monetary behavior uses `balance_cents`, `financial_transactions`, and zero-sum ledger entries. Legacy deposit, withdrawal, investment, loan, and OTP financial mutations have been redirected, retired, or blocked by the cents synchronization trigger. New customer surfaces provide card metadata, sandbox funding, beneficiaries, transfers, transaction details/statements, notifications, and Visa-gated credit. Module 3 must finish the broader admin/security review and remove confirmed-unused legacy reporting code.

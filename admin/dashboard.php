@@ -1,15 +1,5 @@
 <?php
-// Enable error reporting for debugging
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Start session at the beginning (added to avoid any issues with session usage)
-session_start();
-
-// Include database and functions
-require_once '../includes/db.php';
-require_once '../includes/functions.php';
+require_once '../app/bootstrap_financial.php';
 
 // Ensure only admins can access the page
 redirectIfNotAdmin();
@@ -17,9 +7,9 @@ redirectIfNotAdmin();
 // Get system statistics
 $totalUsers = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 $totalAccounts = $pdo->query("SELECT COUNT(*) FROM accounts")->fetchColumn();
-$totalBalance = $pdo->query("SELECT SUM(balance) FROM accounts")->fetchColumn();
+$totalBalance = $pdo->query("SELECT SUM(balance_cents) FROM accounts")->fetchColumn();
 $totalBalance = $totalBalance ?: 0;
-$pendingLoans = $pdo->query("SELECT COUNT(*) FROM loans WHERE status = 'pending'")->fetchColumn();
+$pendingLoans = $pdo->query("SELECT COUNT(*) FROM credit_applications WHERE status = 'under_review'")->fetchColumn();
 
 // Get recent users
 $recentUsers = $pdo->query("SELECT * FROM users ORDER BY created_at DESC LIMIT 5")->fetchAll();
@@ -49,7 +39,7 @@ $recentUsers = $pdo->query("SELECT * FROM users ORDER BY created_at DESC LIMIT 5
                 <nav class="dashboard-nav">
                     <a href="dashboard.php" class="active btn dash-text">Dashboard</a>
                     <a href="manage-users.php" class="btn">Manage Users</a>
-                    <a href="manage-loans.php" class="btn">Manage Loans</a>
+                    <a href="credit-applications.php" class="btn">Credit Applications</a>
                     <a href="manage-investments.php" class="btn">Manage Investments</a>
                     <a href="track-investments.php" class="btn">Users Investments</a>
                     <a href="role.php" class="btn">Roles</a>
@@ -88,11 +78,11 @@ $recentUsers = $pdo->query("SELECT * FROM users ORDER BY created_at DESC LIMIT 5
                 
                 <div class="stat-card">
                     <h3>Total Balance</h3>
-                    <p>₱<?= number_format($totalBalance, 2) ?></p>
+                    <p><?= Money::format((int) $totalBalance) ?></p>
                 </div>
                 
                 <div class="stat-card">
-                    <h3>Pending Loans</h3>
+                    <h3>Pending Credit Reviews</h3>
                     <p><?= $pendingLoans ?></p>
                 </div>
             </div>

@@ -116,7 +116,7 @@ try {
                     <h2>User Information</h2>
                     <p><strong>Name:</strong> <?= htmlspecialchars($loan['full_name']) ?></p>
                     <p><strong>Email:</strong> <?= htmlspecialchars($loan['email']) ?></p>
-                    <p><strong>Loan Amount:</strong> ₱<?= number_format($loan['amount'], 2) ?></p>
+                    <p><strong>Loan Amount:</strong> $<?= number_format($loan['amount'], 2) ?></p>
                     <p><strong>Purpose:</strong> <?= htmlspecialchars($loan['purpose']) ?></p>
                 </div>
 
@@ -150,4 +150,4 @@ try {
         </main>
     </div>
 </body>
-</html> 
+</html>

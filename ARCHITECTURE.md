@@ -18,3 +18,9 @@ Valtoria Bank currently uses staged modernization: direct PHP entry points remai
 Future refactors should create services/repositories only when moving real duplicated behavior. Financial commands will use integer cents, database transactions, row locks, idempotency keys, immutable transaction records, and balanced ledger entries. Provider-specific behavior belongs behind adapters. Views never decide authorization or authoritative financial values.
 
 Roles begin with `customer`, `super_admin`, `operations`, `kyc_reviewer`, `credit_officer`, `support_agent`, and `read_only_auditor`; the legacy `is_admin` flag remains temporarily for compatibility.
+
+## Module 2 financial architecture
+
+`app/Services` now owns card metadata, funding, transfers, ledger posting, credit decisions, disbursement, schedules, and repayments. `Money` converts decimal input to integer cents without floating-point arithmetic. `Reference` creates non-sequential customer references. Each completed monetary command creates one immutable `financial_transactions` record and zero-sum `ledger_entries`; cached `accounts.balance_cents` is updated in the same locked database transaction and is reconciled against the customer ledger.
+
+Funding uses `CardFundingProvider`; only the explicitly labeled sandbox adapter exists. Linked cards contain tokens and safe display metadata, never PAN or CVV. Idempotency is enforced both in services and with unique database constraints. Corrections create reversal transactions and inverse ledger entries.

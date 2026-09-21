@@ -1,6 +1,6 @@
 # Valtoria Bank
 
-Valtoria Bank is a staged modernization of the cloned Nexus PHP/MySQL project into a card-focused financial platform. Module 1 establishes the secure configuration, authentication, documentation, visual system, and public/customer/admin foundations. Legacy financial behavior remains present while it is prepared for the cents-based ledger refactor in Module 2.
+Valtoria Bank is a staged modernization of the cloned Nexus PHP/MySQL project into a card-focused financial platform. Modules 1 and 2 establish the secure application foundation and the cents-based card, funding, transfer, transaction, ledger, notification, and Visa-eligible credit domains.
 
 This repository does not claim a banking charter, deposit insurance, regulatory approval, PCI compliance, or endorsement by Visa or Mastercard.
 
@@ -16,7 +16,7 @@ This repository does not claim a banking charter, deposit insurance, regulatory 
 1. Clone the repository into the web root.
 2. Copy `.env.example` to `.env` and set local database/application values.
 3. Import a scrubbed legacy schema if starting from an empty database.
-4. Back up the database and apply `database/migrations/001_module1_foundation.sql`.
+4. Back up the database and apply migrations `001_module1_foundation.sql`, `002_module2_financial_core.sql`, and `003_module2_legacy_transaction_history.sql` in order.
 5. Run `composer install` when `vendor/` is absent.
 6. Point Apache at the project and visit the `APP_URL` value.
 
@@ -38,7 +38,7 @@ See [DATABASE.md](DATABASE.md). Migrations are forward-only SQL files and should
 
 ## Provider and sandbox configuration
 
-No live card payment, transfer rail, KYC provider, or credit bureau is configured. Existing deposits are legacy simulated behavior and must not be represented as real external charges. Provider interfaces and sandbox adapters are Module 2 work after explicit approval.
+No live card payment, transfer rail, KYC provider, or credit bureau is configured. `FINANCIAL_PROVIDER_MODE=sandbox` provides clearly labeled local funding simulations; no external card is charged. See `INTEGRATIONS.md`.
 
 ## Assets
 
@@ -50,11 +50,12 @@ The legacy `is_admin` field is retained for compatibility. The Module 1 migratio
 
 ## Testing
 
-There is no inherited automated test framework. Before each deployment:
+The project includes a lightweight financial integration test. Before each deployment:
 
 ```powershell
 Get-ChildItem -Recurse -Filter *.php | Where-Object { $_.FullName -notmatch '\\vendor\\' } | ForEach-Object { C:\xampp\php\php.exe -l $_.FullName }
 C:\xampp\php\php.exe -r "require 'includes/bootstrap.php'; echo config('app.name');"
+$env:DB_DATABASE='valtoria_test'; C:\xampp\php\php.exe tests\financial_core_test.php
 ```
 
 Also manually verify registration, login/OTP, logout, password reset, customer/admin authorization, CSRF rejection, uploads, and core page rendering against a disposable database.

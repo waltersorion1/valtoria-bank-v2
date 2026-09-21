@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-21 — Module 2
+
+- Added authoritative integer-cent account balances, immutable financial transactions, balanced ledger entries, references, and idempotency constraints.
+- Added token-only Visa/Mastercard card profiles and a clearly labeled sandbox funding provider.
+- Added beneficiaries, quoted/confirmed card-to-card transfers, server-side fees/limits, notifications, receipts, CSV statements, analytics, and reversals.
+- Added deterministic Visa-card credit eligibility, applications, operations review, facilities, schedules, disbursement, and repayments.
+- Retired legacy deposit, withdrawal, investment, and loan mutation paths from the customer experience.
+- Added financial integration and reconciliation tests plus provider documentation.
+
 ## 2026-09-21 — Module 1
 
 - Added repository audit and architecture/database/security/asset documentation.

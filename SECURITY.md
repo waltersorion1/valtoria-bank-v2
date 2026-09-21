@@ -21,4 +21,17 @@ Immediately revoke every SMTP app password previously committed. Purge secrets a
 
 ## Remaining risk
 
-Legacy state-changing forms still need systematic CSRF conversion; admin GET mutations must become POST; object-level authorization needs a full matrix; uploads need centralized storage; login throttling needs IP/device dimensions; and financial flows require the Module 2 ledger/idempotency work. No compliance, regulatory, card-network endorsement, or absolute-security claim is made.
+Legacy nonfinancial state-changing forms still need systematic CSRF conversion; admin GET mutations must become POST; object-level authorization needs a full matrix; uploads need centralized storage; and login throttling needs IP/device dimensions. No compliance, regulatory, card-network endorsement, or absolute-security claim is made.
+
+## Module 2 controls
+
+- Authoritative amounts use integer USD cents and strict decimal parsing.
+- Monetary services use transactions, deterministic row locking, server-side fees/limits, unique idempotency keys, and balanced ledger assertions.
+- Card profiles store sandbox/provider tokens, network, last four, label, and permitted expiry only; forms never request PAN or CVV.
+- Transaction ownership protects customer details and receipts.
+- Beneficiary ownership and destination validity are checked server-side.
+- Visa credit eligibility uses only KYC, verified Visa metadata, account age, and completed transaction history.
+- Reversals preserve original records and post inverse ledger entries.
+- The sandbox funding adapter is visibly identified and cannot be mistaken for a live external authorization.
+
+Step-up transfer verification is fail-closed when `TRANSFER_STEP_UP_CENTS` is configured above zero; a real OTP/provider step-up adapter is still required before those transfers can proceed.

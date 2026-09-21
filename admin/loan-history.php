@@ -97,7 +97,7 @@ $loanHistory = $stmt->fetchAll();
                             <td data-label="Loan ID"><?= $entry['loan_id'] ?></td>
                             <td data-label="User"><?= htmlspecialchars($entry['full_name']) ?></td>
                             <td data-label="Email"><?= htmlspecialchars($entry['email']) ?></td>
-                            <td data-label="Amount">₱<?= number_format($entry['amount'], 2) ?></td>
+                            <td data-label="Amount">$<?= number_format($entry['amount'], 2) ?></td>
                             <td data-label="Interest"><?= $entry['interest_rate'] ?>%</td>
                             <td data-label="Purpose"><?= htmlspecialchars($entry['purpose']) ?></td>
                             <td data-label="Status"><?= ucfirst($entry['status']) ?></td>

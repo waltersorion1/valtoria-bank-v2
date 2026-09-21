@@ -157,38 +157,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
         }
-    } else {
-        // Handle loan submission
-        if (!isset($_POST['token']) || $_POST['token'] !== $_SESSION['loan_token']) {
-            $error = "Invalid loan submission token.";
-        } else {
-            $amount  = filter_var($_POST['amount'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-            $term    = intval($_POST['term']);
-            $purpose = htmlspecialchars($_POST['purpose'], ENT_QUOTES, 'UTF-8');
-
-            if ($amount < 100) {
-                $error = "Minimum loan amount is ₱100";
-            } elseif ($term < 1 || $term > 60) {
-                $error = "Loan term must be between 1 and 60 months";
-            } else {
-                $interestRate = 5.0;
-                if ($amount > 10000) $interestRate = 4.5;
-                if ($term > 36)     $interestRate += 1.0;
-
-                try {
-                    $loanStmt = $pdo->prepare("
-                        INSERT INTO loans (user_id, amount, interest_rate, term_months, status, purpose)
-                        VALUES (?, ?, ?, ?, 'pending', ?)
-                    ");
-                    $loanStmt->execute([$userId, $amount, $interestRate, $term, $purpose]);
-
-                    $_SESSION['loan_token'] = bin2hex(random_bytes(32));
-                    $success = "Loan application submitted successfully!";
-                } catch (Exception $e) {
-                    $error = "Failed to submit loan: " . $e->getMessage();
-                }
-            }
-        }
     }
 }
 

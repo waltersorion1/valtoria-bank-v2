@@ -2,7 +2,7 @@
 session_start();
 require_once '../includes/db.php';
 
-// Set timezone to Philippine time
+// Use the application timezone configured by the shared bootstrap.
 date_default_timezone_set('Asia/Manila');
 
 if (!isset($_SESSION['user_id'])) {

@@ -15,3 +15,19 @@ mysql -u root -p nexusbank < database/migrations/001_module1_foundation.sql
 ```
 
 Current authoritative legacy balance is `accounts.balance`; `balance` is an inconsistent historical snapshot table. Do not build new features on it.
+
+## Module 2 migration
+
+Apply `database/migrations/002_module2_financial_core.sql` after migration 001. It adds `accounts.balance_cents` and backfills it from the legacy decimal balance, then creates balanced opening ledger entries. From that point, `balance_cents` and the ledger are authoritative; triggers reject direct legacy decimal balance updates and mirror cents back to the compatibility column.
+
+New tables are `financial_transactions`, `ledger_entries`, `linked_cards`, `beneficiaries`, `card_fundings`, `transfers`, `notifications`, `credit_applications`, `credit_facilities`, `repayment_schedule`, `repayments`, `provider_events`, and `product_settings`. Financial history has restrictive foreign keys and no cascade deletion. Migration `003_module2_legacy_transaction_history.sql` copies inherited transactions into the new transaction center as `LEG-*` pre-ledger records. It deliberately does not repost them: the balanced opening entries from migration 002 form the authoritative reconciliation boundary.
+
+Reconciliation queries:
+
+```sql
+SELECT COALESCE(SUM(amount_cents), 0) FROM ledger_entries;
+SELECT a.account_id FROM accounts a
+WHERE a.balance_cents <> COALESCE((SELECT SUM(amount_cents) FROM ledger_entries l WHERE l.account_id=a.account_id), 0);
+```
+
+The first result and the second query's row count must both be zero.

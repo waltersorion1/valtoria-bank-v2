@@ -257,7 +257,7 @@ $users = $users->fetchAll();
                             <td data-label="Name"><?= htmlspecialchars($user['full_name']) ?></td>
                             <td data-label="Email"><?= htmlspecialchars($user['email']) ?></td>
                             <td data-label="Account"><?= $user['account_number'] ?: 'N/A' ?></td>
-                            <td data-label="Balance">₱<?= number_format($user['balance'] ?? 0, 2) ?></td>
+                            <td data-label="Balance">$<?= number_format($user['balance'] ?? 0, 2) ?></td>
                             <td data-label="Status"><?= $user['status'] === 'approved' ? '✅ Approved' : '⏳ Pending' ?></td>
                             <td data-label="ID Verification">
                                 <?php if ($user['id_file_path']): ?>
