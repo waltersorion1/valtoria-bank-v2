@@ -62,11 +62,27 @@ function enforceSessionVersion(PDO $pdo): void {
     if (!$user || !(int)$user['is_active'] || ($known !== null && $known !== (int)$user['session_version'])) {
         $_SESSION=[];
         if (session_status()===PHP_SESSION_ACTIVE) session_destroy();
-        safeRedirect('../login.php?error=session_invalid');
+        $script = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+        $loginPath = str_contains($script, '/admin/') || str_contains($script, '/user/')
+            ? '../login.php?error=session_invalid'
+            : 'login.php?error=session_invalid';
+        safeRedirect($loginPath);
     }
     $_SESSION['session_version']=(int)$user['session_version'];
     $_SESSION['is_admin']=(int)$user['is_admin'];
     $_SESSION['role']=(string)$user['role'];
+}
+
+function featureEnabled(PDO $pdo, string $key, bool $default = false): bool {
+    $stmt = $pdo->prepare('SELECT value_json FROM product_settings WHERE setting_key=?');
+    $stmt->execute([$key]);
+    $value = $stmt->fetchColumn();
+    if ($value === false) return $default;
+    return json_decode((string) $value, true) === true;
+}
+
+function requireFeature(PDO $pdo, string $key, string $message): void {
+    if (!featureEnabled($pdo, $key, false)) throw new RuntimeException($message);
 }
 
 function audit(PDO $pdo, string $action, ?string $targetType = null, string|int|null $targetId = null, array $metadata = []): void {

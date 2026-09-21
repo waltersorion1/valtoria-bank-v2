@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-21 — Module 3
+
+- Completed the granular operations console for customers/KYC, cards, money movement, credit, support, settings, audit, and reconciliation.
+- Added role permissions, session-version invalidation, audited state changes, internal notes, and authenticated support threads.
+- Enforced stored feature toggles in financial/support services and added maintenance mode.
+- Hardened contact validation/email escaping, OTP login/resend, identity-document delivery, and customer support ownership.
+- Removed obsolete GET-based admin/login mutations, restored the credit operations route, and completed responsive/accessibility release checks.
+- Verified all migrations on an isolated MariaDB instance, added Module 3 tests, reconciled ledger balances, and completed HTTP smoke tests.
+
 ## 2026-09-21 — Module 2
 
 - Added authoritative integer-cent account balances, immutable financial transactions, balanced ledger entries, references, and idempotency constraints.

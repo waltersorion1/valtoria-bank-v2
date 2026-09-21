@@ -110,3 +110,9 @@ Module 3 (requires explicit approval): complete operations console, granular per
 ## Module 2 update
 
 The decimal `accounts.balance` and legacy `transactions` table remain compatibility/read-only structures. New monetary behavior uses `balance_cents`, `financial_transactions`, and zero-sum ledger entries. Legacy deposit, withdrawal, investment, loan, and OTP financial mutations have been redirected, retired, or blocked by the cents synchronization trigger. New customer surfaces provide card metadata, sandbox funding, beneficiaries, transfers, transaction details/statements, notifications, and Visa-gated credit. Module 3 must finish the broader admin/security review and remove confirmed-unused legacy reporting code.
+
+## Module 3 completion update
+
+The operations console now covers role-scoped dashboards, customer/KYC review, safe document delivery, card state, immutable transaction reversals, credit decisions/facilities, support, product switches, audit logs, and live ledger reconciliation. Legacy GET mutation routes and the obsolete email-link login approval flow are retired. Customer support is ownership-scoped and internal notes are never selected for customer views. Feature controls are enforced server-side.
+
+The remaining risks are operational rather than hidden: public-root legacy uploads and realistic historic SQL dumps require coordinated retention/history decisions; external providers, legal terms, jurisdiction rules, accessibility testing with assistive technology, penetration testing, and production infrastructure controls require real-world owners.

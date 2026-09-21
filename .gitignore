@@ -1,4 +1,5 @@
 .env
+.module3-mariadb/
 mail_debug.log
 /storage/logs/*.log
 /storage/cache/*

@@ -31,3 +31,7 @@ WHERE a.balance_cents <> COALESCE((SELECT SUM(amount_cents) FROM ledger_entries 
 ```
 
 The first result and the second query's row count must both be zero.
+
+## Module 3 migration
+
+Apply `004_module3_operations.sql` after migration 003. It adds authenticated support cases and messages, internal customer notes, operations indexes, and fail-closed feature-toggle records. The migration was verified from the original schema through all four migrations on MariaDB 10.4.32; 31 application tables were present and both reconciliation checks returned zero.

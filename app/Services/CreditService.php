@@ -22,6 +22,7 @@ final class CreditService
 
     public function apply(int $userId, int $requestedCents, int $termMonths, string $purpose): int
     {
+        requireFeature($this->pdo, 'features.credit_applications', 'Credit applications are temporarily unavailable.');
         $eligibility = $this->eligibility($userId);
         $cfg = config('financial')['credit'];
         if (!$eligibility['eligible']) throw new RuntimeException('Credit eligibility requirements are not currently met.');

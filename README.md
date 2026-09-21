@@ -1,6 +1,6 @@
 # Valtoria Bank
 
-Valtoria Bank is a staged modernization of the cloned Nexus PHP/MySQL project into a card-focused financial platform. Modules 1 and 2 establish the secure application foundation and the cents-based card, funding, transfer, transaction, ledger, notification, and Visa-eligible credit domains.
+Valtoria Bank is a modernized PHP/MySQL card-focused financial platform. Modules 1–3 provide the application foundation, cents-based ledger, token-only card profiles, sandbox funding, transfers, Visa-eligible credit, customer support, and a role-protected operations console.
 
 This repository does not claim a banking charter, deposit insurance, regulatory approval, PCI compliance, or endorsement by Visa or Mastercard.
 
@@ -16,7 +16,7 @@ This repository does not claim a banking charter, deposit insurance, regulatory 
 1. Clone the repository into the web root.
 2. Copy `.env.example` to `.env` and set local database/application values.
 3. Import a scrubbed legacy schema if starting from an empty database.
-4. Back up the database and apply migrations `001_module1_foundation.sql`, `002_module2_financial_core.sql`, and `003_module2_legacy_transaction_history.sql` in order.
+4. Back up the database and apply migrations `001_module1_foundation.sql` through `004_module3_operations.sql` in numeric order.
 5. Run `composer install` when `vendor/` is absent.
 6. Point Apache at the project and visit the `APP_URL` value.
 
@@ -24,7 +24,7 @@ Do not use the committed legacy SQL sample data in a public environment. It cont
 
 ## Environment
 
-The main settings are `APP_ENV`, `APP_DEBUG`, `APP_URL`, `APP_TIMEZONE`, `SESSION_NAME`, `SESSION_IDLE_TIMEOUT`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD`.
+The main settings are `APP_ENV`, `APP_DEBUG`, `APP_URL`, `APP_TIMEZONE`, `SESSION_NAME`, `SESSION_IDLE_TIMEOUT`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `FINANCIAL_PROVIDER_MODE`, `SANDBOX_AUTO_COMPLETE`, and `TRANSFER_STEP_UP_CENTS`.
 
 Keep `APP_DEBUG=false` outside local development. Use a least-privilege database account rather than `root` in shared or production environments.
 
@@ -50,12 +50,13 @@ The legacy `is_admin` field is retained for compatibility. The Module 1 migratio
 
 ## Testing
 
-The project includes a lightweight financial integration test. Before each deployment:
+The project includes financial and operations integration tests. Before each deployment:
 
 ```powershell
 Get-ChildItem -Recurse -Filter *.php | Where-Object { $_.FullName -notmatch '\\vendor\\' } | ForEach-Object { C:\xampp\php\php.exe -l $_.FullName }
 C:\xampp\php\php.exe -r "require 'includes/bootstrap.php'; echo config('app.name');"
 $env:DB_DATABASE='valtoria_test'; C:\xampp\php\php.exe tests\financial_core_test.php
+$env:DB_DATABASE='valtoria_test'; C:\xampp\php\php.exe tests\module3_operations_test.php
 ```
 
 Also manually verify registration, login/OTP, logout, password reset, customer/admin authorization, CSRF rejection, uploads, and core page rendering against a disposable database.
@@ -70,3 +71,4 @@ Also manually verify registration, login/OTP, logout, password reset, customer/a
 - Back up and test migrations before applying them.
 
 Further detail is in [PROJECT_AUDIT.md](PROJECT_AUDIT.md), [ARCHITECTURE.md](ARCHITECTURE.md), and [SECURITY.md](SECURITY.md).
+Use [DEPLOYMENT.md](DEPLOYMENT.md) as the production release gate.

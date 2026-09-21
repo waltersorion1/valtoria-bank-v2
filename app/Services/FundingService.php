@@ -7,6 +7,7 @@ final class FundingService
 
     public function quote(int $amountCents): array
     {
+        requireFeature($this->pdo, 'features.card_funding', 'Card funding is temporarily unavailable.');
         $cfg = config('financial')['funding'];
         if ($amountCents < $cfg['minimum_cents'] || $amountCents > $cfg['maximum_cents']) throw new InvalidArgumentException('Funding amount is outside the available limits.');
         $fee = Money::percentageFee($amountCents, $cfg['fee_basis_points'], $cfg['fee_flat_cents']);
@@ -15,6 +16,7 @@ final class FundingService
 
     public function fund(int $userId, int $cardId, int $amountCents, string $idempotencyKey): array
     {
+        requireFeature($this->pdo, 'features.card_funding', 'Card funding is temporarily unavailable.');
         $financial = new FinancialService($this->pdo);
         if ($existing = $financial->transactionByIdempotency($userId, $idempotencyKey)) return $existing;
         if (config('financial.provider_mode') !== 'sandbox') throw new RuntimeException('Live card funding is unavailable until a provider is configured.');

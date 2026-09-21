@@ -35,3 +35,16 @@ Legacy nonfinancial state-changing forms still need systematic CSRF conversion; 
 - The sandbox funding adapter is visibly identified and cannot be mistaken for a live external authorization.
 
 Step-up transfer verification is fail-closed when `TRANSFER_STEP_UP_CENTS` is configured above zero; a real OTP/provider step-up adapter is still required before those transfers can proceed.
+
+## Module 3 review
+
+- Operations endpoints require granular server-side permissions; read-only auditors cannot mutate records.
+- Every implemented admin mutation uses POST, CSRF validation, allow-listed state values, prepared SQL, and audit logging.
+- Session-version checks invalidate restricted customers and administrators whose role changes.
+- The obsolete email-link login approval endpoints were removed; OTP resend is POST+CSRF.
+- Feature toggles fail closed in the relevant financial/support services, and maintenance mode blocks customer application access.
+- Customer support queries enforce ownership and exclude internal notes.
+- Identity-document delivery verifies permission, real-path containment, file existence, MIME allow-list, and `nosniff` headers.
+- Contact data is stored raw, escaped only for HTML output/email, length-validated, rate-limited per session, and returns delivery-neutral messaging.
+
+Remaining launch requirements include external penetration testing, moving all uploads outside the document root, coordinated Git-history scrubbing, infrastructure rate limiting, CSP/security headers at the web server, and real provider/compliance review.

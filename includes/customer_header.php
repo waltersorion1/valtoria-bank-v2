@@ -2,6 +2,11 @@
 require_once __DIR__ . '/../app/bootstrap_financial.php';
 redirectIfNotLoggedIn();
 enforceSessionVersion($pdo);
+if (!isAdmin() && featureEnabled($pdo, 'system.maintenance_mode', false)) {
+    http_response_code(503);
+    header('Retry-After: 300');
+    exit('Valtoria account services are temporarily unavailable for scheduled maintenance.');
+}
 $appPage = $appPage ?? '';
 $appTitle = $appTitle ?? 'Valtoria Bank';
 $customerId = (int) $_SESSION['user_id'];

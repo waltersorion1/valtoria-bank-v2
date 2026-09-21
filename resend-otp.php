@@ -1,15 +1,11 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-session_start();
-
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/otp.php';
 
-$type = $_GET['type'] ?? 'register';
+$type = $_POST['type'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !in_array($type, ['register', 'login'], true)) safeRedirect('login.php');
+requireCsrf();
 $now = time();
 $cooldownSeconds = 300; // 5 minutes
 

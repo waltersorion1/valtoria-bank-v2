@@ -12,6 +12,9 @@ C:\xampp\php\php.exe tests\financial_core_test.php
 ```
 
 Build `valtoria_test` from a scrubbed legacy schema, then apply migrations `001`, `002`, and `003`. Never point integration tests at production.
+Apply migration `004`, then run `tests/module3_operations_test.php` to validate the role matrix, fail-closed settings, and support-note disclosure boundary.
+
+The Module 3 release pass linted 112 first-party PHP files, rebuilt a disposable MariaDB database through migrations 001–004, ran both integration scripts, reconciled the ledger and cached balances to zero differences, and smoke-tested all public routes plus unauthenticated customer/admin redirects.
 
 ## Manual checks
 

@@ -24,3 +24,9 @@ Roles begin with `customer`, `super_admin`, `operations`, `kyc_reviewer`, `credi
 `app/Services` now owns card metadata, funding, transfers, ledger posting, credit decisions, disbursement, schedules, and repayments. `Money` converts decimal input to integer cents without floating-point arithmetic. `Reference` creates non-sequential customer references. Each completed monetary command creates one immutable `financial_transactions` record and zero-sum `ledger_entries`; cached `accounts.balance_cents` is updated in the same locked database transaction and is reconciled against the customer ledger.
 
 Funding uses `CardFundingProvider`; only the explicitly labeled sandbox adapter exists. Linked cards contain tokens and safe display metadata, never PAN or CVV. Idempotency is enforced both in services and with unique database constraints. Corrections create reversal transactions and inverse ledger entries.
+
+## Module 3 operations architecture
+
+The shared admin shell enforces both `is_admin` and a named permission on every operations route. Roles are `super_admin`, `operations`, `kyc_reviewer`, `credit_officer`, `support_agent`, and `read_only_auditor`; role changes increment `session_version`. Customer restriction, password change, and role change invalidate older sessions. Sensitive actions create immutable audit records.
+
+Feature switches live in `product_settings`. Funding, transfers, credit applications, support updates, and maintenance mode are enforced server-side. Support messages separate customer-visible replies from internal notes. Identity documents are delivered only through the authenticated, MIME-checked `admin/document.php` controller.

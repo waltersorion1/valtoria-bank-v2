@@ -197,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } else {
             // No user found with that email
-            $error = "User account not found. Please double-check your email.";
+            $error = "Invalid email or password.";
         }
     } catch (PDOException $e) {
         error_log("Login error: " . $e->getMessage());

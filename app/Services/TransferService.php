@@ -7,6 +7,7 @@ final class TransferService
 
     public function quote(int $amountCents): array
     {
+        requireFeature($this->pdo, 'features.transfers', 'Transfers are temporarily unavailable.');
         $cfg = config('financial')['transfer'];
         if ($amountCents < $cfg['minimum_cents'] || $amountCents > $cfg['maximum_cents']) throw new InvalidArgumentException('Transfer amount is outside the available limits.');
         if ($cfg['step_up_cents'] > 0 && $amountCents >= $cfg['step_up_cents']) throw new RuntimeException('This transfer requires step-up verification, which is not enabled for this environment.');
@@ -15,6 +16,7 @@ final class TransferService
 
     public function transfer(int $userId, int $beneficiaryId, int $amountCents, string $memo, string $idempotencyKey): array
     {
+        requireFeature($this->pdo, 'features.transfers', 'Transfers are temporarily unavailable.');
         $financial = new FinancialService($this->pdo);
         if ($existing = $financial->transactionByIdempotency($userId, $idempotencyKey)) return $existing;
         $quote = $this->quote($amountCents);
