@@ -49,6 +49,80 @@ final class FinancialService
         $stmt->execute([$userId, $type, $title, $message]);
     }
 
+    public function review(string $reference, string $nextStatus, int $actorUserId, string $note): array
+    {
+        $note = trim($note);
+        if (!in_array($nextStatus, ['processing', 'completed', 'failed'], true)) throw new InvalidArgumentException('Invalid transaction status.');
+        if (mb_strlen($note) < 5) throw new InvalidArgumentException('Provide a specific operations note.');
+        $this->pdo->beginTransaction();
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM financial_transactions WHERE reference=? AND type IN ('card_funding','card_transfer') FOR UPDATE");
+            $stmt->execute([$reference]);
+            $transaction = $stmt->fetch();
+            if (!$transaction) throw new RuntimeException('Reviewable transaction was not found.');
+            $current = (string) $transaction['status'];
+            $allowed = $current === 'pending' ? ['processing', 'failed'] : ($current === 'processing' ? ['completed', 'failed'] : []);
+            if (!in_array($nextStatus, $allowed, true)) throw new RuntimeException('That status transition is not allowed.');
+
+            if ($nextStatus === 'completed') {
+                if ($transaction['type'] === 'card_funding') $this->completeFunding($transaction);
+                else $this->completeTransfer($transaction);
+            } else {
+                $failureCode = $nextStatus === 'failed' ? 'manual_review_failed' : null;
+                $this->pdo->prepare('UPDATE financial_transactions SET status=?,failure_code=? WHERE transaction_id=?')->execute([$nextStatus, $failureCode, $transaction['transaction_id']]);
+                if ($transaction['type'] === 'card_funding') {
+                    $this->pdo->prepare("UPDATE card_fundings SET status=?,failure_code=IF(?='failed','manual_review_failed',failure_code) WHERE financial_transaction_id=?")
+                        ->execute([$nextStatus, $nextStatus, $transaction['transaction_id']]);
+                } else {
+                    $this->pdo->prepare('UPDATE transfers SET status=? WHERE financial_transaction_id=?')->execute([$nextStatus, $transaction['transaction_id']]);
+                }
+            }
+            $this->pdo->prepare("INSERT INTO audit_logs(actor_user_id,action,target_type,target_id,metadata_json) VALUES(?,'transaction.status_changed','financial_transaction',?,?)")
+                ->execute([$actorUserId, (string) $transaction['transaction_id'], json_encode(['from'=>$current,'to'=>$nextStatus,'note'=>mb_substr($note,0,500)], JSON_THROW_ON_ERROR)]);
+            $this->notify((int)$transaction['user_id'], 'transaction_'.$nextStatus, 'Transaction '.ucfirst($nextStatus), $reference.' is now '.$nextStatus.'.');
+            $this->pdo->commit();
+            return ['reference'=>$reference,'status'=>$nextStatus];
+        } catch (Throwable $exception) {
+            if ($this->pdo->inTransaction()) $this->pdo->rollBack();
+            throw $exception;
+        }
+    }
+
+    private function completeFunding(array $transaction): void
+    {
+        $stmt=$this->pdo->prepare('SELECT * FROM card_fundings WHERE financial_transaction_id=? FOR UPDATE');$stmt->execute([$transaction['transaction_id']]);$funding=$stmt->fetch();
+        if(!$funding || $funding['status']!=='processing') throw new RuntimeException('Funding request is not ready for completion.');
+        $account=$this->pdo->prepare('SELECT balance_cents FROM accounts WHERE account_id=? FOR UPDATE');$account->execute([$funding['destination_account_id']]);if($account->fetchColumn()===false)throw new RuntimeException('Destination account is unavailable.');
+        $this->postEntries((int)$transaction['transaction_id'],[
+            ['account_id'=>(int)$funding['destination_account_id'],'ledger_account'=>'customer:'.$funding['destination_account_id'],'amount_cents'=>(int)$funding['amount_cents']],
+            ['account_id'=>null,'ledger_account'=>'partner_funding_clearing','amount_cents'=>-((int)$funding['amount_cents']+(int)$funding['fee_cents'])],
+            ['account_id'=>null,'ledger_account'=>'funding_fee_revenue','amount_cents'=>(int)$funding['fee_cents']],
+        ]);
+        $this->pdo->prepare('UPDATE accounts SET balance_cents=balance_cents+? WHERE account_id=?')->execute([$funding['amount_cents'],$funding['destination_account_id']]);
+        $this->pdo->prepare("UPDATE card_fundings SET status='completed',completed_at=UTC_TIMESTAMP() WHERE funding_id=?")->execute([$funding['funding_id']]);
+        $this->pdo->prepare("UPDATE financial_transactions SET status='completed',completed_at=UTC_TIMESTAMP(),failure_code=NULL WHERE transaction_id=?")->execute([$transaction['transaction_id']]);
+    }
+
+    private function completeTransfer(array $transaction): void
+    {
+        $stmt=$this->pdo->prepare('SELECT * FROM transfers WHERE financial_transaction_id=? FOR UPDATE');$stmt->execute([$transaction['transaction_id']]);$transfer=$stmt->fetch();
+        if(!$transfer || $transfer['status']!=='processing') throw new RuntimeException('Transfer request is not ready for completion.');
+        $ids=[(int)$transfer['source_account_id'],(int)$transfer['destination_account_id']];sort($ids,SORT_NUMERIC);
+        $lock=$this->pdo->prepare('SELECT account_id,balance_cents,user_id FROM accounts WHERE account_id IN (?,?) ORDER BY account_id FOR UPDATE');$lock->execute($ids);$accounts=[];foreach($lock->fetchAll() as $row)$accounts[(int)$row['account_id']]=$row;
+        $source=$accounts[(int)$transfer['source_account_id']]??null;$destination=$accounts[(int)$transfer['destination_account_id']]??null;
+        $total=(int)$transfer['amount_cents']+(int)$transfer['fee_cents'];if(!$source||!$destination)throw new RuntimeException('Transfer account is unavailable.');if((int)$source['balance_cents']<$total)throw new RuntimeException('Customer balance is no longer sufficient.');
+        $this->postEntries((int)$transaction['transaction_id'],[
+            ['account_id'=>(int)$transfer['source_account_id'],'ledger_account'=>'customer:'.$transfer['source_account_id'],'amount_cents'=>-$total],
+            ['account_id'=>(int)$transfer['destination_account_id'],'ledger_account'=>'customer:'.$transfer['destination_account_id'],'amount_cents'=>(int)$transfer['amount_cents']],
+            ['account_id'=>null,'ledger_account'=>'transfer_fee_revenue','amount_cents'=>(int)$transfer['fee_cents']],
+        ]);
+        $this->pdo->prepare('UPDATE accounts SET balance_cents=balance_cents-? WHERE account_id=?')->execute([$total,$transfer['source_account_id']]);
+        $this->pdo->prepare('UPDATE accounts SET balance_cents=balance_cents+? WHERE account_id=?')->execute([$transfer['amount_cents'],$transfer['destination_account_id']]);
+        $this->pdo->prepare("UPDATE transfers SET status='completed',completed_at=UTC_TIMESTAMP() WHERE transfer_id=?")->execute([$transfer['transfer_id']]);
+        $this->pdo->prepare("UPDATE financial_transactions SET status='completed',completed_at=UTC_TIMESTAMP(),failure_code=NULL WHERE transaction_id=?")->execute([$transaction['transaction_id']]);
+        $this->notify((int)$destination['user_id'],'transfer_received','Transfer received',Money::format((int)$transfer['amount_cents']).' was received.');
+    }
+
     public function reverse(string $reference, int $actorUserId, string $reason): array
     {
         $reason = trim($reason);

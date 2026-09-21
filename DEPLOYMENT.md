@@ -12,7 +12,7 @@
 - Move identity/avatar storage outside the document root and configure authenticated delivery plus backup/retention policy.
 - Remove sample personal data and SQL dumps from deploy artifacts. Coordinate secret/history scrubbing and rotate all historically exposed credentials.
 - Create the first `super_admin` through a controlled database/CLI process, then verify every role with a separate test account.
-- Keep all feature switches disabled until their operational owner approves launch. `FINANCIAL_PROVIDER_MODE=sandbox` must remain visible unless a reviewed live adapter is installed.
+- Keep feature switches disabled until their operational owner approves launch. Use `FINANCIAL_PROVIDER_MODE=manual` only with a staffed review process, partner confirmation procedure, reconciliation ownership, and tested status controls.
 - Configure monitoring for application errors, security events, audit activity, provider failures, reconciliation exceptions, disk capacity, and backups.
 
 ## Required environment variables

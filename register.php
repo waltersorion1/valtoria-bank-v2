@@ -1,273 +1,136 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
-// No OTP required at this stage unless you want OTP after approval
+require_once __DIR__ . '/includes/otp.php';
 
-// Initialize variables
+if (isLoggedIn()) {
+    safeRedirect(isAdmin() ? 'admin/dashboard' : 'user/dashboard');
+}
+
 $errors = [];
-$data = [
-    'full_name' => '',
-    'email' => '',
-    'password' => '',
-    'confirm_password' => '',
-    'age' => '',
-    'birth_year' => '',
-    'address' => '',
-    'occupation' => '',
-    'phone' => '',
-    'id_type' => ''
-];
+$success = '';
+$data = ['full_name'=>'','email'=>'','phone'=>'','address'=>'','occupation'=>''];
+$requiresApproval = featureEnabled($pdo, 'features.require_account_approval', false);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    requireCsrf();
-    // Sanitize and validate inputs
-    $data['full_name'] = sanitizeInput($_POST['full_name'] ?? '');
-    $data['email'] = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
-    $data['password'] = $_POST['password'] ?? '';
-    $data['confirm_password'] = $_POST['confirm_password'] ?? '';
-    $data['age'] = (int)($_POST['age'] ?? 0);
-    $data['birth_year'] = (int)($_POST['birth_year'] ?? 0);
-    $data['address'] = sanitizeInput($_POST['address'] ?? '');
-    $data['occupation'] = sanitizeInput($_POST['occupation'] ?? '');
-    $data['phone'] = sanitizeInput($_POST['phone'] ?? '');
-    $data['id_type'] = sanitizeInput($_POST['id_type'] ?? '');
+    try {
+        requireCsrf();
+        $data['full_name'] = trim((string) ($_POST['full_name'] ?? ''));
+        $data['email'] = strtolower(trim((string) ($_POST['email'] ?? '')));
+        $data['phone'] = trim((string) ($_POST['phone'] ?? ''));
+        $data['address'] = trim((string) ($_POST['address'] ?? ''));
+        $data['occupation'] = trim((string) ($_POST['occupation'] ?? ''));
+        $password = (string) ($_POST['password'] ?? '');
+        $confirmation = (string) ($_POST['confirm_password'] ?? '');
 
-    // Validate ID file upload
-    if (!isset($_FILES['id_file']) || $_FILES['id_file']['error'] !== UPLOAD_ERR_OK) {
-        $errors[] = "Please upload a valid ID document";
-    } else {
-        $allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-        $maxFileSize = 5 * 1024 * 1024; // 5MB
+        if (mb_strlen($data['full_name']) < 2 || mb_strlen($data['full_name']) > 100) $errors[] = 'Enter your full legal name.';
+        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL) || mb_strlen($data['email']) > 100) $errors[] = 'Enter a valid email address.';
+        if (!preg_match('/^\+[1-9]\d{7,14}$/', $data['phone'])) $errors[] = 'Enter your phone number in international format, such as +12025550123.';
+        if (mb_strlen($data['address']) < 5 || mb_strlen($data['address']) > 1000) $errors[] = 'Enter your current residential address.';
+        if (mb_strlen($data['occupation']) > 50) $errors[] = 'Occupation must be 50 characters or fewer.';
+        if (!validatePassword($password)) $errors[] = 'Use at least eight characters with uppercase, lowercase, a number, and a symbol.';
+        if ($password !== $confirmation) $errors[] = 'Passwords do not match.';
+        if (!isset($_POST['legal_consent'])) $errors[] = 'You must accept the Terms and Privacy Policy to continue.';
 
-        $detectedType = (new finfo(FILEINFO_MIME_TYPE))->file($_FILES['id_file']['tmp_name']);
-        if (!in_array($detectedType, $allowedTypes, true)) {
-            $errors[] = "Invalid file type. Please upload JPG, PNG, or PDF files only.";
-        }
-
-        if ($_FILES['id_file']['size'] > $maxFileSize) {
-            $errors[] = "File size too large. Maximum size is 5MB.";
-        }
-    }
-
-    // Validate password
-    if (!validatePassword($data['password'])) {
-        $errors[] = "Password must contain at least:<br>
-                     - One uppercase letter<br>
-                     - One lowercase letter<br>
-                     - One number<br>
-                     - One special character<br>
-                     - Minimum 8 characters";
-    }
-
-    if ($data['password'] !== $data['confirm_password']) {
-        $errors[] = "Passwords do not match";
-    }
-
-    if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Invalid email format";
-    }
-
-    if (!preg_match('/^\+?\d{7,15}$/', $data['phone'])) {
-        $errors[] = "Invalid phone number format";
-    }
-
-    if ($data['age'] < 18 || $data['age'] > 120) {
-        $errors[] = "Age must be between 18 and 120";
-    }
-
-    $currentYear = (int)date('Y');
-    if ($data['birth_year'] < 1900 || $data['birth_year'] > $currentYear) {
-        $errors[] = "Birth year must be between 1900 and $currentYear";
-    }
-
-    $calculatedAge = $currentYear - $data['birth_year'];
-    if (abs($calculatedAge - $data['age']) > 1) {
-        $errors[] = "Age and birth year don't match (you entered age {$data['age']} and birth year {$data['birth_year']}, which would make you approximately $calculatedAge years old)";
-    }
-
-    if (empty($errors)) {
-        try {
-            $stmt = $pdo->prepare("SELECT email FROM users WHERE email = ?");
+        if (!$errors) {
+            $stmt = $pdo->prepare('SELECT 1 FROM users WHERE LOWER(email)=?');
             $stmt->execute([$data['email']]);
-            if ($stmt->fetch()) {
-                $errors[] = "Email already registered";
-            }
-        } catch (PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            $errors[] = "System error. Please try again later.";
+            if ($stmt->fetchColumn()) $errors[] = 'An account already exists for this email address.';
         }
-    }
 
-    if (empty($errors)) {
-        try {
+        if (!$errors) {
             $pdo->beginTransaction();
-
-            $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password_hash, age, birth_year, address, occupation, phone, status) 
-                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
-            $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
-            $stmt->execute([
-                $data['full_name'],
-                $data['email'],
-                $passwordHash,
-                $data['age'],
-                $data['birth_year'],
-                $data['address'],
-                $data['occupation'],
-                $data['phone']
-            ]);
-
-            $userId = $pdo->lastInsertId();
-
-            // Handle ID file upload
-            $uploadDir = __DIR__ . '/uploads/id_verifications/';
-            if (!file_exists($uploadDir)) {
-                mkdir($uploadDir, 0750, true);
-            }
-
-            $extensions = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'application/pdf' => 'pdf'];
-            $fileName = 'id_' . $userId . '_' . bin2hex(random_bytes(12)) . '.' . $extensions[$detectedType];
-            $filePath = $uploadDir . $fileName;
-
-            if (move_uploaded_file($_FILES['id_file']['tmp_name'], $filePath)) {
-                $stmt = $pdo->prepare("INSERT INTO id_verifications (user_id, id_type, id_file_path) VALUES (?, ?, ?)");
-                $stmt->execute([$userId, $data['id_type'], 'uploads/id_verifications/' . $fileName]);
-            } else {
-                throw new Exception("Failed to upload ID file");
-            }
-
+            $status = $requiresApproval ? 'pending' : 'approved';
+            $stmt = $pdo->prepare("INSERT INTO users(full_name,email,password_hash,address,occupation,phone,status,role,kyc_status) VALUES(?,?,?,?,?,?,?,'customer','not_started')");
+            $stmt->execute([mb_substr($data['full_name'],0,100),$data['email'],password_hash($password,PASSWORD_DEFAULT),mb_substr($data['address'],0,1000),mb_substr($data['occupation'],0,50),$data['phone'],$status]);
+            $userId = (int) $pdo->lastInsertId();
+            $pdo->prepare('INSERT INTO accounts(user_id,account_number,balance_cents) VALUES(?,?,0)')->execute([$userId, generateUniqueAccountNumber($pdo)]);
+            audit($pdo, 'customer.registered', 'user', $userId, ['approval_required'=>$requiresApproval]);
             $pdo->commit();
-            $success = "Registration submitted! Please wait for admin approval.";
-        } catch (PDOException $e) {
-            $pdo->rollBack();
-            error_log("Registration error: " . $e->getMessage());
-            $errors[] = "Registration failed. Please try again.";
+
+            if ($requiresApproval) {
+                $success = 'Your application has been received. We will notify you after the initial account review.';
+                $data = array_fill_keys(array_keys($data), '');
+            } elseif (emailOtpAvailable($pdo)) {
+                $_SESSION['temp_user_id'] = $userId;
+                $_SESSION['temp_is_admin'] = 0;
+                if (generateOTP($data['email'])) safeRedirect('otp-verification.php?type=login');
+                unset($_SESSION['temp_user_id'], $_SESSION['temp_is_admin']);
+                $errors[] = 'Your account was created, but verification email delivery failed. Please sign in and try again.';
+            } else {
+                establishAuthenticatedSession($pdo, $userId);
+                safeRedirect('user/dashboard.php?welcome=1');
+            }
         }
+    } catch (Throwable $exception) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        error_log('Registration request failed.');
+        $errors[] = 'We could not submit your application. Please try again.';
     }
 }
 ?>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Open an account | Valtoria Bank</title>
-    <link rel="stylesheet" href="./assets/css/register.css">
-    <link rel="stylesheet" href="./assets/css/valtoria.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Apply for a Valtoria Bank account through a clear, secure onboarding process.">
+  <title>Open an account | Valtoria Bank</title>
+  <link rel="stylesheet" href="assets/css/valtoria.css">
+  <link rel="stylesheet" href="assets/css/register.css">
 </head>
-<body>
-
-<div class="wrapper">
-            <div class="left-panel">
-                <div>
-                <span class="valtoria-wordmark">Valtoria Bank</span>
-                </div>
-                <div class="handshake-container">
-                    <img src="./assets/images/handshake.png" alt="Handshake" class="handshake" />
-                </div>
-            
-            <div class="content">
-                <h2 class="headline">Partnership for<br>Business Growth</h2>
-                <p class="description">
-                A clear, secure way to manage cards, transfers, and eligible credit products.
-                </p>
-            </div>
-            </div>
-
-        <div class="container">
-              <div class="login-form">
-                    <p style="text-align: start;"> Let's get you Started </p> 
-                    <h1 style="text-align: start;">Create your Account</h1>
-
-                        <?php if (!empty($errors)): ?>
-                            <div class="alert alert-danger">
-                                <?php foreach ($errors as $error): ?>
-                                    <p><?= $error ?></p>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php elseif (!empty($success)): ?>
-                            <div class="alert alert-success">
-                                <p><?= $success ?></p>
-                            </div>
-                        <?php endif; ?>
-
-                        <form method="POST" id="registrationForm" enctype="multipart/form-data">
-            <?= csrfField() ?>
-            <div class="form-group">
-                <div class="form-field">
-                <input type="text" name="full_name" required placeholder="" value="<?= htmlspecialchars($data['full_name']) ?>">
-                <label>Full Name</label>
-                </div>
-
-                <div class="form-row">
-                <div class="form-field">
-                <input type="email" name="email" required placeholder=" " value="<?= htmlspecialchars($data['email']) ?>">
-                <label>Email</label>
-                </div>
-                <div class="form-field">
-                <input type="text" name="address" required placeholder=" " value="<?= htmlspecialchars($data['address']) ?>">
-                <label>Address</label>
-                </div>
-                </div>
-                <div class="form-field">
-                <input type="text" name="occupation" required placeholder=" " value="<?= htmlspecialchars($data['occupation']) ?>">
-                <label>Occupation</label>
-                </div>
-
-                <div class="form-row">
-                <div class="form-field">
-                    <input type="tel" name="phone" required placeholder=" " value="<?= htmlspecialchars($data['phone']) ?>">
-                    <label>Phone</label>
-                </div>
-                <div class="form-field">
-                    <input type="number" name="age" min="18" max="120" required placeholder=" " value="<?= htmlspecialchars($data['age']) ?>">
-                    <label>Age</label>
-                </div>
-                </div>
-
-                <div class="form-row">
-                <div class="form-field">
-                    <input type="number" name="birth_year" min="1900" max="<?= date('Y') ?>" required placeholder=" " value="<?= htmlspecialchars($data['birth_year']) ?>">
-                    <label>Birth Year</label>
-                </div>
-                </div>
-
-                <div class="id-verification-fields">
-                    <div class="form-field">
-                        <label for="id_type">ID Type</label>
-                        <select name="id_type" id="id_type" required>
-                            <option value="">Select ID Type</option>
-                            <option value="passport">Passport</option>
-                            <option value="drivers_license">Driver's License</option>
-                            <option value="national_id">National ID</option>
-                            <option value="student_id">Student ID</option>
-                            <option value="other">Other Government ID</option>
-                        </select>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="id_file">Upload ID Document (JPG, PNG, or PDF)</label>
-                        <input type="file" name="id_file" id="id_file" required accept=".jpg,.jpeg,.png,.pdf">
-                    </div>
-                </div>
-
-                <div class="form-field">
-                <input type="password" name="password" required placeholder=" ">
-                <label>Password</label>
-                </div>
-
-                <div class="form-field">
-                <input type="password" name="confirm_password" required placeholder=" ">
-                <label>Confirm Password</label>
-                </div>
-            </div>
-
-            <button type="submit" class="btn-submit">Register</button>
-            </form>
-
-                        <div class="login-link" style="text-align: center; margin-top: 20px; color: #6b7280;">
-                            Already have an account? <a href="login.php" style="text-decoration: none;">Sign in</a>
-                        </div>
-        </div>
+<body class="onboarding-page">
+<a class="skip-link" href="#registration">Skip to application</a>
+<main class="onboarding-shell">
+  <aside class="onboarding-story" aria-label="Application overview">
+    <a class="valtoria-wordmark onboarding-brand" href="index.php">Valtoria Bank</a>
+    <div class="story-content">
+      <span class="eyebrow">Open your account</span>
+      <h1>A clear start to managing your money.</h1>
+      <p>Submit your core contact details now. You can securely complete identity information from your protected profile.</p>
+      <ol class="onboarding-steps">
+        <li><span>1</span><div><strong>Create your profile</strong><small>Contact information and secure credentials.</small></div></li>
+        <li><span>2</span><div><strong><?= $requiresApproval ? 'Initial review' : 'Immediate access' ?></strong><small><?= $requiresApproval ? 'We review the application before account access.' : 'Your account opens after successful submission.' ?></small></div></li>
+        <li><span>3</span><div><strong>Complete verification</strong><small>Add birth and identity details from your protected profile.</small></div></li>
+      </ol>
     </div>
-</div>
+    <p class="story-footnote">Never send a password, one-time code, full card number, or CVV to support.</p>
+  </aside>
+
+  <section class="onboarding-form-panel" id="registration">
+    <div class="form-progress" aria-label="Application progress"><span class="active" data-progress="1">1 <b>Your details</b></span><i></i><span data-progress="2">2 <b>Security</b></span></div>
+    <div class="form-heading"><span class="form-kicker">Account application</span><h2 id="step-title">Tell us about yourself</h2><p id="step-description">Enter the contact details we need to create your profile.</p></div>
+
+    <?php if ($errors): ?><div class="form-alert error" role="alert"><strong>Please review the following:</strong><ul><?php foreach ($errors as $error): ?><li><?= e($error) ?></li><?php endforeach; ?></ul></div><?php endif; ?>
+    <?php if ($success): ?><div class="form-alert success" role="status"><strong>Application submitted</strong><p><?= e($success) ?></p><a href="login.php">Return to sign in</a></div><?php endif; ?>
+
+    <?php if (!$success): ?><form method="post" class="registration-form">
+      <?= csrfField() ?>
+      <fieldset class="form-step active" data-step="1"><legend class="sr-only">Personal and contact details</legend>
+        <div class="registration-grid">
+          <div class="field full"><label for="full_name">Full legal name <span aria-hidden="true">*</span></label><input id="full_name" name="full_name" value="<?= e($data['full_name']) ?>" maxlength="100" autocomplete="name" required></div>
+          <div class="field"><label for="email">Email address <span aria-hidden="true">*</span></label><input id="email" type="email" name="email" value="<?= e($data['email']) ?>" maxlength="100" autocomplete="email" required></div>
+          <div class="field"><label for="phone">Mobile number <span aria-hidden="true">*</span></label><input id="phone" type="tel" name="phone" value="<?= e($data['phone']) ?>" maxlength="16" autocomplete="tel" placeholder="+12025550123" required><small>Include the international country code.</small></div>
+          <div class="field"><label for="occupation">Occupation</label><input id="occupation" name="occupation" value="<?= e($data['occupation']) ?>" maxlength="50" autocomplete="organization-title"></div>
+          <div class="field full"><label for="address">Residential address <span aria-hidden="true">*</span></label><textarea id="address" name="address" maxlength="1000" autocomplete="street-address" required><?= e($data['address']) ?></textarea></div>
+        </div>
+        <div class="step-actions"><span></span><button class="button button-primary" type="button" data-next>Continue</button></div>
+      </fieldset>
+      <fieldset class="form-step" data-step="2" hidden><legend class="sr-only">Secure your account</legend>
+        <div class="registration-grid">
+          <div class="field"><label for="password">Password <span aria-hidden="true">*</span></label><input id="password" type="password" name="password" autocomplete="new-password" aria-describedby="password-help" required></div>
+          <div class="field"><label for="confirm_password">Confirm password <span aria-hidden="true">*</span></label><input id="confirm_password" type="password" name="confirm_password" autocomplete="new-password" required></div>
+          <p class="password-help full" id="password-help">Use 8 or more characters with uppercase, lowercase, a number, and a symbol.</p>
+        </div>
+        <label class="consent-row full"><input type="checkbox" name="legal_consent" value="1" required><span>I agree to the <a href="terms.php" target="_blank">Terms of Service</a> and acknowledge the <a href="privacy-policy.php" target="_blank">Privacy Policy</a>.</span></label>
+        <div class="step-actions"><button class="button button-secondary" type="button" data-back>Back</button><button class="button button-primary" type="submit"><?= $requiresApproval ? 'Submit application' : 'Create my account' ?></button></div>
+      </fieldset>
+      <p class="signin-prompt">Already have an account? <a href="login.php">Sign in</a></p>
+    </form><?php endif; ?>
+  </section>
+</main>
+<script src="assets/js/register.js"></script>
 </body>
 </html>

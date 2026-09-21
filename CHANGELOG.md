@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-21 — Account onboarding refinement
+
+- Rebuilt account registration as a responsive, accessible application with clearer validation and legal consent.
+- Moved date-of-birth and identity-document collection into the authenticated customer profile.
+- Added protected identity upload storage, randomized filenames, MIME/size validation, review-state reset, and audited document delivery.
+- Added migration 005 to support deferred identity collection without placeholder age or birth-year data.
+- Split registration into two viewport-conscious steps and hide the onboarding story on mobile.
+- Added configurable account approval and email OTP controls; both default to streamlined auto-approval with OTP disabled.
+
 ## 2026-09-21 — Module 3
 
 - Completed the granular operations console for customers/KYC, cards, money movement, credit, support, settings, audit, and reconciliation.

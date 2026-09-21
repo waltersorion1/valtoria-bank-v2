@@ -1,6 +1,6 @@
 # Valtoria Bank
 
-Valtoria Bank is a modernized PHP/MySQL card-focused financial platform. Modules 1–3 provide the application foundation, cents-based ledger, token-only card profiles, sandbox funding, transfers, Visa-eligible credit, customer support, and a role-protected operations console.
+Valtoria Bank is a modernized PHP/MySQL card-focused financial platform. Modules 1–3 provide the application foundation, cents-based ledger, masked card profiles, manually reviewed funding and transfers, Visa-eligible credit, customer support, and a role-protected operations console.
 
 This repository does not claim a banking charter, deposit insurance, regulatory approval, PCI compliance, or endorsement by Visa or Mastercard.
 
@@ -16,11 +16,21 @@ This repository does not claim a banking charter, deposit insurance, regulatory 
 1. Clone the repository into the web root.
 2. Copy `.env.example` to `.env` and set local database/application values.
 3. Import a scrubbed legacy schema if starting from an empty database.
-4. Back up the database and apply migrations `001_module1_foundation.sql` through `004_module3_operations.sql` in numeric order.
+4. Back up the database and apply migrations `001_module1_foundation.sql` through `006_onboarding_controls.sql` in numeric order.
 5. Run `composer install` when `vendor/` is absent.
 6. Point Apache at the project and visit the `APP_URL` value.
 
 Do not use the committed legacy SQL sample data in a public environment. It contains realistic personal records.
+
+### Development seed
+
+After applying migrations 001–006, replace all data in the configured development database with synthetic fixtures:
+
+```powershell
+C:\xampp\php\php.exe database\seeds\development.php --force
+```
+
+The command is intentionally destructive and requires `--force`. It creates `example.test` customers and operations roles, masked development card records, balanced manually reviewed funding/transfer activity, a credit application, notifications, and a support thread. The shared local password printed by the command must never be used outside development.
 
 ## Environment
 
@@ -36,9 +46,9 @@ Email is disabled by default. Configure `MAIL_ENABLED`, `MAIL_HOST`, `MAIL_PORT`
 
 See [DATABASE.md](DATABASE.md). Migrations are forward-only SQL files and should be applied once after a verified backup. Module 1 intentionally does not alter financial amount representation.
 
-## Provider and sandbox configuration
+## Manual operations configuration
 
-No live card payment, transfer rail, KYC provider, or credit bureau is configured. `FINANCIAL_PROVIDER_MODE=sandbox` provides clearly labeled local funding simulations; no external card is charged. See `INTEGRATIONS.md`.
+No external card payment, transfer rail, KYC provider, or credit bureau is configured. `FINANCIAL_PROVIDER_MODE=manual` submits funding and transfers into an audited operations queue; no external authorization is claimed. See `INTEGRATIONS.md`.
 
 ## Assets
 

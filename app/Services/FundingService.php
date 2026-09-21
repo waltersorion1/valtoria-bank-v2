@@ -19,7 +19,7 @@ final class FundingService
         requireFeature($this->pdo, 'features.card_funding', 'Card funding is temporarily unavailable.');
         $financial = new FinancialService($this->pdo);
         if ($existing = $financial->transactionByIdempotency($userId, $idempotencyKey)) return $existing;
-        if (config('financial.provider_mode') !== 'sandbox') throw new RuntimeException('Live card funding is unavailable until a provider is configured.');
+        if (config('financial.provider_mode') !== 'manual') throw new RuntimeException('Card funding is unavailable until manual operations mode is configured.');
         $quote = $this->quote($amountCents);
         $this->pdo->beginTransaction();
         try {
@@ -38,12 +38,12 @@ final class FundingService
             if ($providerResult['status'] === 'completed') {
                 $financial->postEntries($transaction['transaction_id'], [
                     ['account_id' => (int) $account['account_id'], 'ledger_account' => 'customer:' . $account['account_id'], 'amount_cents' => $amountCents],
-                    ['account_id' => null, 'ledger_account' => 'sandbox_funding_clearing', 'amount_cents' => -$quote['total_cents']],
+                    ['account_id' => null, 'ledger_account' => 'partner_funding_clearing', 'amount_cents' => -$quote['total_cents']],
                     ['account_id' => null, 'ledger_account' => 'funding_fee_revenue', 'amount_cents' => $quote['fee_cents']],
                 ]);
                 $this->pdo->prepare('UPDATE accounts SET balance_cents = balance_cents + ? WHERE account_id = ?')->execute([$amountCents, $account['account_id']]);
             }
-            $financial->notify($userId, 'funding_' . $providerResult['status'], 'Card funding ' . $providerResult['status'], Money::format($amountCents) . ' funding is ' . $providerResult['status'] . ' in sandbox mode.');
+            $financial->notify($userId, 'funding_' . $providerResult['status'], 'Card funding ' . $providerResult['status'], Money::format($amountCents) . ' funding request is ' . $providerResult['status'] . ' and awaiting operations review.');
             $this->pdo->commit();
             return $transaction + ['provider_message' => $providerResult['message']];
         } catch (Throwable $exception) {

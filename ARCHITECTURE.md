@@ -23,7 +23,7 @@ Roles begin with `customer`, `super_admin`, `operations`, `kyc_reviewer`, `credi
 
 `app/Services` now owns card metadata, funding, transfers, ledger posting, credit decisions, disbursement, schedules, and repayments. `Money` converts decimal input to integer cents without floating-point arithmetic. `Reference` creates non-sequential customer references. Each completed monetary command creates one immutable `financial_transactions` record and zero-sum `ledger_entries`; cached `accounts.balance_cents` is updated in the same locked database transaction and is reconciled against the customer ledger.
 
-Funding uses `CardFundingProvider`; only the explicitly labeled sandbox adapter exists. Linked cards contain tokens and safe display metadata, never PAN or CVV. Idempotency is enforced both in services and with unique database constraints. Corrections create reversal transactions and inverse ledger entries.
+Funding uses `CardFundingProvider` with a manual partner-review adapter. Linked cards contain a partner reference and safe display metadata, never PAN or CVV. Funding and transfer requests post ledger entries only after operations confirms completion. Idempotency is enforced in services and database constraints; corrections create reversal transactions and inverse entries.
 
 ## Module 3 operations architecture
 

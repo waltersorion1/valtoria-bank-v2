@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 return [
     'currency' => 'USD',
-    'provider_mode' => env('FINANCIAL_PROVIDER_MODE', 'sandbox'),
-    'sandbox_auto_complete' => filter_var(env('SANDBOX_AUTO_COMPLETE', 'true'), FILTER_VALIDATE_BOOL),
+    'provider_mode' => env('FINANCIAL_PROVIDER_MODE', 'manual'),
     'transfer' => [
         'minimum_cents' => 100,
         'maximum_cents' => 500000,

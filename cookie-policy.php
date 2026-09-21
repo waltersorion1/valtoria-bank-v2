@@ -1,63 +1,12 @@
 <?php
-session_start();
-require_once __DIR__ . '/includes/db.php';
-require_once __DIR__ . '/includes/functions.php';
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cookie Policy | Valtoria Bank</title>
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #212529;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        h1 {
-            text-align: center;
-            color: #0056b3;
-            margin-bottom: 20px;
-        }
-        p {
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-        .sticker {
-            position: absolute;
-            bottom: -30px;
-            right: -30px;
-            width: 100px;
-            height: 100px;
-            background: url('assets/images/sticker-cookie.png') no-repeat center center/contain;
-            opacity: 0.8;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="sticker"></div>
-        <h1>Cookie Policy</h1>
-        <p>Our website uses cookies to improve your browsing experience and provide personalized services.</p>
-        <p>1. What Are Cookies: Small text files stored on your device to remember preferences and activity.</p>
-        <p>2. Types of Cookies: We use essential, performance, and targeting cookies.</p>
-        <p>3. Managing Cookies: You can control cookie settings through your browser preferences.</p>
-        <p>4. Third-Party Cookies: We may allow third-party cookies for analytics and advertising.</p>
-        <p>5. Consent: By using our site, you consent to our use of cookies as described in this policy.</p>
-        <p>For questions, please contact our support team.</p>
-    </div>
-</body>
-</html>
+declare(strict_types=1);
+$legalPage=['title'=>'Cookie Policy','eyebrow'=>'Browser storage and choices','summary'=>'What cookies and similar technologies do on Valtoria, which ones are necessary, and how you can control optional use.','notice_title'=>'Current approach','notice'=>'Essential session and security storage supports sign-in and form protection. Optional analytics or advertising technologies should not be activated without an appropriate consent choice where required.','sections'=>[
+['number'=>'01','id'=>'what','title'=>'What cookies are','content'=>'<p>Cookies are small text records a website asks a browser to store. Similar technologies include local storage, pixels, and device identifiers. They can maintain a session, remember a choice, protect a form, or measure performance.</p><p>Read this with the <a href="privacy-policy.php">Privacy Policy</a>, which explains how associated personal information is handled.</p>'],
+['number'=>'02','id'=>'categories','title'=>'Categories we use','content'=>'<div class="legal-table-wrap"><table class="legal-table"><thead><tr><th>Category</th><th>Purpose</th><th>Choice</th></tr></thead><tbody><tr><td>Strictly necessary</td><td>Sessions, authentication, fraud prevention, and form security.</td><td>Required for core operation.</td></tr><tr><td>Preferences</td><td>Remember requested display, language, or accessibility settings.</td><td>Optional unless needed for a requested setting.</td></tr><tr><td>Analytics</td><td>Understand aggregate usage, errors, and performance.</td><td>Optional where consent is required.</td></tr><tr><td>Advertising</td><td>Measure campaigns or personalize marketing.</td><td>Optional and not activated without required notice and choice.</td></tr></tbody></table></div>'],
+['number'=>'03','id'=>'current','title'=>'Current essential technologies','content'=>'<p>The platform uses a session identifier to maintain authenticated state and associate requests with the correct browser. Security storage may support request-forgery protection, timeout enforcement, and abuse prevention. A session identifier is not intended to contain a password, full card number, or security code.</p><p>If optional vendors are added, this policy and any consent interface should be updated before deployment.</p>'],
+['number'=>'04','id'=>'duration','title'=>'Session and persistent duration','content'=>'<p>Session cookies generally expire when the browser session ends, though browser behavior may preserve them temporarily. Persistent cookies remain until expiry or removal. Durations should be no longer than reasonably necessary.</p>'],
+['number'=>'05','id'=>'third-parties','title'=>'Third-party technologies','content'=>'<p>A third party may set or read a cookie only when its integrated service loads. It may have a separate privacy notice. Valtoria does not claim analytics or advertising technologies are in use unless they are actually deployed and disclosed.</p>'],
+['number'=>'06','id'=>'controls','title'=>'Your controls','content'=>'<p>You can delete or block cookies in browser settings and use any available on-site privacy control for optional categories. Choices may be device- and browser-specific.</p><p>Blocking necessary storage can sign you out or prevent secure forms from working. Disabling optional storage should not prevent core account access.</p>'],
+['number'=>'07','id'=>'signals','title'=>'Do Not Track and global signals','content'=>'<p>“Do Not Track” signals are not interpreted consistently. Where applicable law requires recognition of an approved opt-out preference signal, we will process it as required for that browser and jurisdiction.</p>'],
+['number'=>'08','id'=>'changes','title'=>'Changes to this policy','content'=>'<p>We may update this policy when technologies, vendors, purposes, or legal requirements change. A new consent choice will be requested where required.</p>']]];
+require __DIR__.'/includes/legal_page.php';

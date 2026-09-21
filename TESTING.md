@@ -18,8 +18,8 @@ The Module 3 release pass linted 112 first-party PHP files, rebuilt a disposable
 
 ## Manual checks
 
-- Link Visa and Mastercard sandbox card metadata and verify only token/last-four metadata is stored.
-- Review then confirm funding; verify explicit sandbox disclosure and duplicate-submit behavior.
+- Submit Visa and Mastercard metadata, approve compatibility, and verify no PAN or CVV is stored.
+- Submit funding, move it through processing and completion, and verify duplicate-submit protection.
 - Add a beneficiary, quote a transfer, confirm it, and verify amount/fee/receipt.
 - Attempt self-transfer, insufficient funds, invalid amount, and daily-limit cases.
 - Verify credit stays unavailable without KYC plus a verified Visa card and configured history.

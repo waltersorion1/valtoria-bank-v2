@@ -37,21 +37,13 @@ final class TransferService
             foreach ($accountLocks->fetchAll() as $locked) $lockedBalances[(int) $locked['account_id']] = (int) $locked['balance_cents'];
             $source['balance_cents'] = $lockedBalances[(int) $source['account_id']] ?? throw new RuntimeException('Source account is unavailable.');
             if ((int) $source['balance_cents'] < $quote['total_cents']) throw new RuntimeException('Insufficient available balance.');
-            $daily = $this->pdo->prepare('SELECT COALESCE(SUM(amount_cents + fee_cents),0) FROM transfers WHERE user_id = ? AND status = \'completed\' AND initiated_at >= UTC_DATE()');
+            $daily = $this->pdo->prepare("SELECT COALESCE(SUM(amount_cents + fee_cents),0) FROM transfers WHERE user_id = ? AND status IN ('pending','processing','completed') AND initiated_at >= UTC_DATE()");
             $daily->execute([$userId]);
             if ((int) $daily->fetchColumn() + $quote['total_cents'] > config('financial')['transfer']['daily_limit_cents']) throw new RuntimeException('Daily transfer limit exceeded.');
-            $transaction = $financial->createTransaction($userId, (int) $source['account_id'], 'card_transfer', $amountCents, $quote['fee_cents'], 'completed', $memo !== '' ? $memo : 'Card-to-card transfer', $idempotencyKey, ['beneficiary_id' => $beneficiaryId]);
-            $stmt = $this->pdo->prepare('INSERT INTO transfers (financial_transaction_id, user_id, source_account_id, beneficiary_id, destination_account_id, amount_cents, fee_cents, status, memo, idempotency_key, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, \'completed\', ?, ?, UTC_TIMESTAMP())');
+            $transaction = $financial->createTransaction($userId, (int) $source['account_id'], 'card_transfer', $amountCents, $quote['fee_cents'], 'pending', $memo !== '' ? $memo : 'Card-to-card transfer', $idempotencyKey, ['beneficiary_id' => $beneficiaryId]);
+            $stmt = $this->pdo->prepare('INSERT INTO transfers (financial_transaction_id, user_id, source_account_id, beneficiary_id, destination_account_id, amount_cents, fee_cents, status, memo, idempotency_key, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, \'pending\', ?, ?, NULL)');
             $stmt->execute([$transaction['transaction_id'], $userId, $source['account_id'], $beneficiaryId, $beneficiary['destination_account_id'], $amountCents, $quote['fee_cents'], mb_substr(trim($memo), 0, 140), $idempotencyKey]);
-            $financial->postEntries($transaction['transaction_id'], [
-                ['account_id' => (int) $source['account_id'], 'ledger_account' => 'customer:' . $source['account_id'], 'amount_cents' => -$quote['total_cents']],
-                ['account_id' => (int) $beneficiary['destination_account_id'], 'ledger_account' => 'customer:' . $beneficiary['destination_account_id'], 'amount_cents' => $amountCents],
-                ['account_id' => null, 'ledger_account' => 'transfer_fee_revenue', 'amount_cents' => $quote['fee_cents']],
-            ]);
-            $this->pdo->prepare('UPDATE accounts SET balance_cents = balance_cents - ? WHERE account_id = ?')->execute([$quote['total_cents'], $source['account_id']]);
-            $this->pdo->prepare('UPDATE accounts SET balance_cents = balance_cents + ? WHERE account_id = ?')->execute([$amountCents, $beneficiary['destination_account_id']]);
-            $financial->notify($userId, 'transfer_completed', 'Transfer completed', Money::format($amountCents) . ' was sent to ' . $beneficiary['display_name'] . '.');
-            $financial->notify((int) $beneficiary['destination_user_id'], 'transfer_received', 'Transfer received', Money::format($amountCents) . ' was received.');
+            $financial->notify($userId, 'transfer_pending', 'Transfer submitted', Money::format($amountCents) . ' transfer to ' . $beneficiary['display_name'] . ' is awaiting operations review.');
             $this->pdo->commit();
             return $transaction;
         } catch (Throwable $exception) {

@@ -1,9 +1,17 @@
-# Provider integrations
+# Integrations and manual operations
 
-Module 2 introduces `CardFundingProvider` and `SandboxCardFundingProvider`. `FINANCIAL_PROVIDER_MODE=sandbox` is the only implemented mode. Sandbox funding is visibly labeled, uses synthetic `sbox_pm_*` payment-method tokens and `SBOX-*` references, and does not contact or claim authorization from Visa, Mastercard, or a processor.
+Valtoria currently uses a manual partner-operations model. No external card, transfer, KYC, credit-bureau, or payment API is called by the application.
 
-A live adapter must not be enabled until provider documentation and credentials are supplied. It must tokenize card data in provider-hosted fields, support 3DS/SCA where required, map provider states without auto-completing unknown outcomes, verify webhook signatures, reject replayed provider event references, and redact payloads. The application must never receive or store CVV and should not receive full PAN.
+## Card funding
 
-No live transfer rail, KYC vendor, SMS service, credit bureau, or document-storage provider is configured.
+`ManualCardFundingProvider` creates a pending request and an internal reference. It does not claim an external authorization or charge. Operations must move the request from `pending` to `processing`, then to `completed` or `failed`. Customer balance and balanced ledger entries are posted only at completion.
 
-Support email delivery remains best-effort; authenticated in-app support is authoritative. Before live launch, select and document card funding/3DS, transfer rail, KYC, transactional email, SMS/step-up, secure document storage, and any lawful credit-decision providers.
+## Transfers
+
+Customer transfer submissions remain pending. Operations review them in the same two-stage queue. Available balance is rechecked and ledger entries are posted atomically when completion is confirmed.
+
+## Card compatibility
+
+The application accepts safe card metadata and an approved partner reference. It never accepts or stores a full PAN or CVV. Administrators approve or reject compatibility using masked metadata and the partner's approved out-of-band process.
+
+Before adding a card-data intake channel, obtain a reviewed PCI DSS architecture, document roles and retention, and use a compliant partner-controlled or isolated channel.

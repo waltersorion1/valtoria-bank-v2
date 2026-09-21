@@ -85,6 +85,31 @@ function requireFeature(PDO $pdo, string $key, string $message): void {
     if (!featureEnabled($pdo, $key, false)) throw new RuntimeException($message);
 }
 
+function emailOtpAvailable(PDO $pdo): bool {
+    $mail = config('mail');
+    return featureEnabled($pdo, 'features.email_otp', false)
+        && (bool) ($mail['enabled'] ?? false)
+        && !empty($mail['host'])
+        && !empty($mail['username'])
+        && !empty($mail['password'])
+        && !empty($mail['from_address']);
+}
+
+function establishAuthenticatedSession(PDO $pdo, int $userId): void {
+    $stmt = $pdo->prepare('SELECT user_id,is_admin,role,status,is_active,session_version FROM users WHERE user_id=?');
+    $stmt->execute([$userId]);
+    $user = $stmt->fetch();
+    if (!$user || $user['status'] !== 'approved' || !(bool) $user['is_active']) throw new RuntimeException('This account is not available.');
+    regenerateSession();
+    $_SESSION['user_id'] = (int) $user['user_id'];
+    $_SESSION['is_admin'] = (int) $user['is_admin'];
+    $_SESSION['role'] = $user['role'] ?: ((int) $user['is_admin'] === 1 ? 'super_admin' : 'customer');
+    $_SESSION['session_version'] = (int) $user['session_version'];
+    $_SESSION['last_activity'] = time();
+    $_SESSION['_fingerprint'] = hash('sha256', (string) ($_SERVER['HTTP_USER_AGENT'] ?? 'unknown'));
+    unset($_SESSION['temp_user_id'], $_SESSION['temp_is_admin']);
+}
+
 function audit(PDO $pdo, string $action, ?string $targetType = null, string|int|null $targetId = null, array $metadata = []): void {
     $stmt = $pdo->prepare('INSERT INTO audit_logs(actor_user_id,action,target_type,target_id,metadata_json) VALUES(?,?,?,?,?)');
     $stmt->execute([$_SESSION['user_id'] ?? null, $action, $targetType, $targetId === null ? null : (string)$targetId, $metadata ? json_encode($metadata, JSON_THROW_ON_ERROR) : null]);
@@ -115,7 +140,7 @@ function requireRole(string ...$roles): void {
 }
 
 function generateAccountNumber() {
-    return 'SB' . str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT);
+    return 'VT' . str_pad((string) random_int(0, 99999999), 8, '0', STR_PAD_LEFT);
 }
 
 function generateUniqueAccountNumber($pdo) {

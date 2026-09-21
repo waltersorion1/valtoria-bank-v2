@@ -12,7 +12,7 @@ final class CardService
         return $stmt->fetchAll();
     }
 
-    public function addSandboxCard(int $userId, string $network, string $lastFour, string $cardholderName, int $expiryMonth, int $expiryYear): int
+    public function submitForReview(int $userId, string $network, string $lastFour, string $cardholderName, int $expiryMonth, int $expiryYear, string $partnerReference): int
     {
         $network = strtolower($network);
         if (!in_array($network, ['visa', 'mastercard'], true)) throw new InvalidArgumentException('Only Visa and Mastercard are supported.');
@@ -21,15 +21,17 @@ final class CardService
         $cardholderName = trim($cardholderName);
         if ($cardholderName === '' || mb_strlen($cardholderName) > 100) throw new InvalidArgumentException('Enter the cardholder name.');
 
-        $providerToken = 'sbox_pm_' . bin2hex(random_bytes(16));
+        $partnerReference = trim($partnerReference);
+        if ($partnerReference !== '' && !preg_match('/^[A-Za-z0-9._-]{4,80}$/', $partnerReference)) throw new InvalidArgumentException('Enter a valid partner card reference.');
+        $providerToken = 'manual_ref_' . ($partnerReference !== '' ? $partnerReference : bin2hex(random_bytes(16)));
         $this->pdo->beginTransaction();
         try {
             $hasDefault = $this->pdo->prepare('SELECT 1 FROM linked_cards WHERE user_id = ? AND is_default = 1 LIMIT 1');
             $hasDefault->execute([$userId]);
-            $stmt = $this->pdo->prepare('INSERT INTO linked_cards (user_id, provider, provider_payment_method_token, network, last_four, cardholder_name, expiry_month, expiry_year, verification_status, status, is_default, verified_at) VALUES (?, \'sandbox\', ?, ?, ?, ?, ?, ?, \'verified\', \'active\', ?, UTC_TIMESTAMP())');
-            $stmt->execute([$userId, $providerToken, $network, $lastFour, $cardholderName, $expiryMonth, $expiryYear, $hasDefault->fetchColumn() ? 0 : 1]);
+            $stmt = $this->pdo->prepare('INSERT INTO linked_cards (user_id, provider, provider_payment_method_token, network, last_four, cardholder_name, expiry_month, expiry_year, verification_status, status, is_default, verified_at) VALUES (?, \'manual_partner_review\', ?, ?, ?, ?, ?, ?, \'pending\', \'active\', 0, NULL)');
+            $stmt->execute([$userId, $providerToken, $network, $lastFour, $cardholderName, $expiryMonth, $expiryYear]);
             $cardId = (int) $this->pdo->lastInsertId();
-            (new FinancialService($this->pdo))->notify($userId, 'card_verified', 'Card ready in sandbox', ucfirst($network) . ' ending ' . $lastFour . ' was verified by the sandbox adapter.');
+            (new FinancialService($this->pdo))->notify($userId, 'card_review_pending', 'Card submitted for review', ucfirst($network) . ' ending ' . $lastFour . ' is awaiting compatibility review.');
             $this->pdo->commit();
             return $cardId;
         } catch (Throwable $exception) {

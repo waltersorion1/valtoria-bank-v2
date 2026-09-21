@@ -35,3 +35,9 @@ The first result and the second query's row count must both be zero.
 ## Module 3 migration
 
 Apply `004_module3_operations.sql` after migration 003. It adds authenticated support cases and messages, internal customer notes, operations indexes, and fail-closed feature-toggle records. The migration was verified from the original schema through all four migrations on MariaDB 10.4.32; 31 application tables were present and both reconciliation checks returned zero.
+
+## Profile identity migration
+
+Apply `005_profile_identity_onboarding.sql` after migration 004. It makes the inherited `age` and `birth_year` fields nullable, adds an authoritative nullable `date_of_birth`, and enforces one identity-verification record per customer. New registrations intentionally leave identity fields empty; customers submit them later from the authenticated profile.
+
+Apply `006_onboarding_controls.sql` after migration 005. It adds disabled-by-default controls for manual account approval and email OTP. With approval disabled, registration creates an approved customer account and signs the customer in. Email OTP is used only when both its database switch and complete SMTP environment configuration are enabled.

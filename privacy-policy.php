@@ -1,94 +1,14 @@
 <?php
-session_start();
-require_once __DIR__ . '/includes/db.php';
-require_once __DIR__ . '/includes/functions.php';
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Privacy Policy | Valtoria Bank</title>
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #212529;
-        }
-        .container {
-            max-width: 900px;
-            width: 100%;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: relative;
-            text-align: center; /* Center content */
-            margin: 0 auto;
-        }
-        h1 {
-            text-align: center;
-            color: #0056b3;
-            margin-bottom: 20px;
-        }
-        p {
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-        .sticker {
-            position: absolute;
-            top: -30px;
-            right: -30px;
-            width: 100px;
-            height: 100px;
-            background: url('assets/images/sticker-privacy.png') no-repeat center center/contain;
-            opacity: 0.8;
-        }
-        @media (max-width: 768px) {
-            body, html {
-                display: block;
-                padding: 20px;
-            }
-            .container {
-                margin: 20px auto;
-                padding: 20px 15px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="sticker"></div>
-        <h1>Privacy Policy</h1>
-        <p>At Valtoria Bank, we are committed to handling personal information carefully and transparently.</p>
-        <p>1. Information Collection: We collect information necessary to provide and improve our services.</p>
-        <p>2. Use of Information: Your data is used only for legitimate banking purposes and not shared without consent.</p>
-        <p>3. Security: We implement robust security measures to safeguard your information.</p>
-        <p>4. Cookies: Our website uses cookies to enhance user experience. See our Cookie Policy for details.</p>
-        <p>5. Your Rights: You have the right to access, correct, or delete your personal data.</p>
-        <p>For more information, please contact our privacy officer.</p>
-        <div style="max-width: 900px; margin-left: auto; margin-right: auto; text-align: center; margin-top: 20px;">
-            <button id="agreeBtn" style="background-color: #28a745; color: white; border: none; padding: 12px 25px; margin: 10px; border-radius: 5px; font-size: 16px; cursor: pointer;">Agree</button>
-            <button id="disagreeBtn" style="background-color: #dc3545; color: white; border: none; padding: 12px 25px; margin: 10px; border-radius: 5px; font-size: 16px; cursor: pointer;">Disagree</button>
-        </div>
-    </div>
-    <script>
-        document.getElementById('agreeBtn').addEventListener('click', function() {
-            alert('Thank you for agreeing to the Privacy Policy.');
-            window.location.href = 'index.php';
-        });
-        document.getElementById('disagreeBtn').addEventListener('click', function() {
-            alert('You must agree to the Privacy Policy to use our services.');
-            // Stay on the same page if disagree
-        });
-    </script>
-<!-- <?php include 'includes/footer.php'; ?> -->
-</body>
-</html>
+declare(strict_types=1);
+$legalPage=['title'=>'Privacy Policy','eyebrow'=>'Privacy and data use','summary'=>'How Valtoria collects, uses, shares, protects, and retains information when you visit the platform, open an account, or request a financial operation.','notice_title'=>'A note about payment-card data','notice'=>'Never send a full card number or card security code through email, chat, support tickets, or general forms. Card information may only be submitted through an expressly designated secure channel.','sections'=>[
+['number'=>'01','id'=>'scope','title'=>'Scope and roles','content'=>'<p>This policy applies to the Valtoria website, authenticated account area, support channels, and operational services that link to it. “Valtoria,” “we,” and “us” refer to the operator identified in your account agreement or product disclosure. A partner’s own policy applies to processing within its separate service.</p><p>Depending on the service and applicable law, we may decide why and how information is processed or process it on behalf of an identified partner.</p>'],
+['number'=>'02','id'=>'information','title'=>'Information we collect','content'=>'<h3>Information you provide</h3><ul><li>Identity, contact, profile, and verification information.</li><li>Operation requests, beneficiaries, credit applications, supporting documents, messages, complaints, and consents.</li><li>Permitted card metadata such as network, cardholder label, expiry information, and last four digits.</li></ul><h3>Information generated through use</h3><ul><li>Account references, balances, ledger entries, request status, review decisions, timestamps, audit records, and support history.</li><li>Device, browser, IP address, session, security-event, and diagnostic information.</li></ul><div class="legal-callout"><strong>Card security codes are not retained after authorization.</strong> Full card data must not be placed in free-text fields or ordinary support channels.</div>'],
+['number'=>'03','id'=>'use','title'=>'How we use information','content'=>'<p>We use information to administer accounts; authenticate users; receive, review, approve, reject, process, complete, or fail requested operations; maintain financial and audit records; communicate status; prevent fraud; provide support; investigate incidents; and comply with applicable obligations.</p><p>Where required, processing may rely on a contract, legitimate security or operational interests, legal obligations, vital interests, or consent. The basis depends on your location and the activity.</p>'],
+['number'=>'04','id'=>'manual-review','title'=>'Manual review and decisions','content'=>'<p>Funding, transfer, credit, and other requests may be handled manually by authorized personnel. A submission is only a request—not proof of authorization or completion. We may validate identity, eligibility, balance, supporting records, and risk indicators before marking it processing, completed, or failed.</p><p>Where applicable law provides rights concerning decisions with significant effects, you may request information or human review.</p>'],
+['number'=>'05','id'=>'sharing','title'=>'When information is shared','content'=>'<p>We may disclose the minimum necessary information to the compatible card or service partner involved in a request, infrastructure and communications suppliers, professional advisers, verification or fraud-prevention providers, authorities where lawfully required, and parties involved in a corporate transaction.</p><p>We do not sell personal information for money. If local law treats an optional analytics or advertising disclosure as a “sale” or “sharing,” the applicable choice will be provided before it is enabled.</p>'],
+['number'=>'06','id'=>'retention','title'=>'Retention and deletion','content'=>'<p>We retain information only as reasonably needed for account administration, transaction records, disputes, fraud prevention, security, tax, accounting, and legal obligations. When retention is no longer justified, information is deleted, anonymized, or isolated from routine use.</p><p>A deletion request may not override mandatory recordkeeping, anti-fraud, dispute, or legal-hold requirements.</p>'],
+['number'=>'07','id'=>'rights','title'=>'Your privacy choices and rights','content'=>'<p>Depending on your location, you may request access, correction, deletion, restriction, portability, objection, withdrawal of consent, or review of certain decisions. We may verify identity and lawful exceptions may apply. You may also have a right to complain to the competent privacy authority.</p>'],
+['number'=>'08','id'=>'transfers','title'=>'International processing','content'=>'<p>Valtoria, personnel, or providers may process information outside your country. Where law requires safeguards for an international transfer, we will use an approved transfer mechanism or another lawful basis.</p>'],
+['number'=>'09','id'=>'security','title'=>'Security and incidents','content'=>'<p>We use safeguards proportionate to the information and service, but no online system is risk-free. Protect your credentials, review activity, and promptly report suspected compromise. See the <a href="security-policy.php">Security Policy</a>.</p><p>We investigate qualifying incidents and notify affected people or authorities when applicable law requires it.</p>'],
+['number'=>'10','id'=>'changes','title'=>'Children, changes, and contact','content'=>'<p>The service is not directed to children or anyone below the minimum age in the applicable account terms. We may update this policy as services, operations, or laws change and will provide notice of material changes where required.</p>']]];
+require __DIR__.'/includes/legal_page.php';

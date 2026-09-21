@@ -6,7 +6,7 @@ require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/Support/Money.php';
 require_once __DIR__ . '/Support/Reference.php';
 require_once __DIR__ . '/Providers/CardFundingProvider.php';
-require_once __DIR__ . '/Providers/SandboxCardFundingProvider.php';
+require_once __DIR__ . '/Providers/ManualCardFundingProvider.php';
 require_once __DIR__ . '/Services/FinancialService.php';
 require_once __DIR__ . '/Services/CardService.php';
 require_once __DIR__ . '/Services/FundingService.php';

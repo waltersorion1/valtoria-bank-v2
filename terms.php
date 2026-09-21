@@ -1,93 +1,14 @@
 <?php
-session_start();
-require_once __DIR__ . '/includes/db.php';
-require_once __DIR__ . '/includes/functions.php';
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Terms and Conditions | Valtoria Bank</title>
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #212529;
-        }
-        .container {
-            max-width: 900px;
-            width: 100%;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: relative;
-            text-align: center; /* Center content */
-            margin: 0 auto;
-        }
-        h1 {
-            text-align: center;
-            color: #0056b3;
-            margin-bottom: 20px;
-        }
-        p {
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-        .sticker {
-            position: absolute;
-            top: -30px;
-            right: -30px;
-            width: 100px;
-            height: 100px;
-            background: url('assets/images/sticker-terms.png') no-repeat center center/contain;
-            opacity: 0.8;
-        }
-        @media (max-width: 768px) {
-            body, html {
-                display: block;
-                padding: 20px;
-            }
-            .container {
-                margin: 20px auto;
-                padding: 20px 15px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="sticker"></div>
-        <h1>Terms and Conditions</h1>
-        <p>Welcome to Valtoria Bank. By using our services, you agree to the following terms and conditions.</p>
-        <p>1. Account Usage: You agree to use your account responsibly and keep your credentials confidential.</p>
-        <p>2. Transactions: Transactions may be subject to verification, limits, and availability.</p>
-        <p>3. Privacy: We respect your privacy and handle your data according to our Privacy Policy.</p>
-        <p>4. Account security: Customers must protect credentials and promptly report suspected unauthorized activity.</p>
-        <p>5. Changes: We reserve the right to update these terms at any time. Continued use of our services constitutes acceptance of changes.</p>
-        <p>For full details, please contact our support team.</p>
-        <div style="max-width: 900px; margin-left: auto; margin-right: auto; text-align: center; margin-top: 20px;">
-            <button id="agreeBtn" style="background-color: #28a745; color: white; border: none; padding: 12px 25px; margin: 10px; border-radius: 5px; font-size: 16px; cursor: pointer;">Agree</button>
-            <button id="disagreeBtn" style="background-color: #dc3545; color: white; border: none; padding: 12px 25px; margin: 10px; border-radius: 5px; font-size: 16px; cursor: pointer;">Disagree</button>
-        </div>
-    </div>
-    <script>
-        document.getElementById('agreeBtn').addEventListener('click', function() {
-            alert('Thank you for agreeing to the Terms and Conditions.');
-            window.location.href = 'index.php';
-        });
-        document.getElementById('disagreeBtn').addEventListener('click', function() {
-            alert('You must agree to the Terms and Conditions to use our services.');
-            // Stay on the same page if disagree
-        });
-    </script>
-</body>
-</html>
+declare(strict_types=1);
+$legalPage=['title'=>'Terms of Service','eyebrow'=>'Account and service terms','summary'=>'The rules for accessing Valtoria, requesting financial operations, understanding manual review, and keeping your account secure.','notice_title'=>'Requests are not instant transactions','notice'=>'Funding, transfer, and credit submissions may require manual review. A request is not complete until its status is marked completed and the corresponding account entry is posted.','sections'=>[
+['number'=>'01','id'=>'agreement','title'=>'Agreement and service operator','content'=>'<p>These Terms govern your use of Valtoria and form part of your agreement with the operator identified in your account-specific agreement or product disclosure. By using an account, you agree to these Terms, the Privacy Policy, applicable product terms, fee disclosures, and pre-submission instructions.</p><p>More specific product terms control if they conflict with these general Terms. Availability, eligibility, limits, and legal protections vary by jurisdiction.</p>'],
+['number'=>'02','id'=>'eligibility','title'=>'Eligibility and account information','content'=>'<p>You must have legal capacity, meet disclosed age and location requirements, and provide accurate information. Use only your own account unless formally authorized for another person or organization.</p><p>We may request verification before opening an account, enabling a feature, or processing an operation. Platform access does not guarantee approval of funding, transfer, or credit.</p>'],
+['number'=>'03','id'=>'security','title'=>'Your security responsibilities','content'=>'<ul><li>Protect your password, one-time codes, devices, and recovery details.</li><li>Review beneficiaries, amounts, fees, and instructions before submitting.</li><li>Promptly report unauthorized access, incorrect data, or unrecognized activity.</li><li>Never place a full card number or security code in messages, email, notes, or support tickets.</li></ul>'],
+['number'=>'04','id'=>'operations','title'=>'How operation requests work','content'=>'<p>Funding, card-to-card transfer, credit, and repayment requests may be checked manually. We may approve, decline, pause, request information, or cancel for legal, risk, security, eligibility, balance, limit, operational, or partner reasons.</p><div class="legal-table-wrap"><table class="legal-table"><thead><tr><th>Status</th><th>Meaning</th></tr></thead><tbody><tr><td>Pending</td><td>Received and awaiting review.</td></tr><tr><td>Processing</td><td>Approved for operational handling but not final.</td></tr><tr><td>Completed</td><td>Finalized in Valtoria’s record and posted to the applicable ledger.</td></tr><tr><td>Failed</td><td>Not completed; correction or a new request may be needed.</td></tr><tr><td>Reversed</td><td>A correcting entry was posted against a completed operation.</td></tr></tbody></table></div><p>Use the authenticated record and available balance—not email, screenshots, or verbal statements—as the service record.</p>'],
+['number'=>'05','id'=>'cards','title'=>'Partner cards and funding','content'=>'<p>Only compatible cards supported through an approved partner arrangement may be eligible. A network name or logo does not imply endorsement. The cardholder must authorize use.</p><p>Required card details may be provided only through a designated secure process, never email or general support. Security codes must not be retained after authorization. Permitted masked metadata and references may be kept for display, reconciliation, disputes, and compliance.</p>'],
+['number'=>'06','id'=>'balances','title'=>'Balances, limits, fees, and corrections','content'=>'<p>Applicable amounts, fees, limits, and totals are shown before confirmation or in product disclosures. Pending or processing items may not affect available balance until posted. We may correct duplicate, erroneous, unauthorized, or reversed entries through traceable accounting records rather than silently rewriting completed records.</p>'],
+['number'=>'07','id'=>'credit','title'=>'Credit requests','content'=>'<p>A credit application is a request, not a promise to lend. Eligibility, pricing, terms, documents, disbursement, repayment, and notices are governed by the credit agreement and applicable law. Credit is not available until approved, agreed, and recorded as disbursed.</p>'],
+['number'=>'08','id'=>'prohibited','title'=>'Prohibited use','content'=>'<p>Do not use the service for fraud, money laundering, sanctions evasion, unlawful commerce, unauthorized access, impersonation, abusive automation, security interference, or a card or account you are not authorized to use.</p>'],
+['number'=>'09','id'=>'restriction','title'=>'Suspension, closure, and availability','content'=>'<p>We may restrict features, hold requests, suspend access, or close accounts where reasonably necessary for security, investigation, law, partner requirements, service integrity, or breach. Where permitted, we will explain the action and provide a support route. Services may be interrupted and no requested product is guaranteed to remain available.</p>'],
+['number'=>'10','id'=>'liability','title'=>'Liability, complaints, and changes','content'=>'<p>Nothing excludes rights or liability that cannot lawfully be excluded. Applicable warranty limits, liability caps, governing law, complaint route, regulator or ombudsman, and dispute forum are stated in your account-specific agreement.</p><p>We may update these Terms for legal, security, operational, or product reasons and will provide notice where required.</p>']]];
+require __DIR__.'/includes/legal_page.php';

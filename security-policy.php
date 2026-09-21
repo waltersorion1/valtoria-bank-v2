@@ -1,94 +1,13 @@
 <?php
-session_start();
-require_once __DIR__ . '/includes/db.php';
-require_once __DIR__ . '/includes/functions.php';
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Security Policy | Valtoria Bank</title>
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #212529;
-        }
-        .container {
-            max-width: 900px;
-            width: 100%;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: relative;
-            text-align: center; /* Center content */
-            margin: 0 auto;
-        }
-        h1 {
-            text-align: center;
-            color: #0056b3;
-            margin-bottom: 20px;
-        }
-        p {
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-        .sticker {
-            position: absolute;
-            top: -30px;
-            right: -30px;
-            width: 100px;
-            height: 100px;
-            background: url('assets/images/sticker-security.png') no-repeat center center/contain;
-            opacity: 0.8;
-        }
-        @media (max-width: 768px) {
-            body, html {
-                display: block;
-                padding: 20px;
-            }
-            .container {
-                margin: 20px auto;
-                padding: 20px 15px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="sticker"></div>
-        <h1>Security Policy</h1>
-        <p>At Valtoria Bank, protecting personal and financial information is a core product requirement.</p>
-        <p>1. Data Protection: We use advanced encryption and security protocols to protect your data.</p>
-        <p>2. Access Control: Only authorized personnel have access to sensitive information.</p>
-        <p>3. Fraud Prevention: We monitor accounts for suspicious activity and take immediate action.</p>
-        <p>4. Secure Transactions: All online transactions are secured with SSL and multi-factor authentication.</p>
-        <p>5. Incident Response: We have procedures in place to respond to security incidents promptly.</p>
-        <p>For any security concerns, please contact our support team immediately.</p>
-        <div style="max-width: 900px; margin-left: auto; margin-right: auto; text-align: center; margin-top: 20px;">
-            <button id="agreeBtn" style="background-color: #28a745; color: white; border: none; padding: 12px 25px; margin: 10px; border-radius: 5px; font-size: 16px; cursor: pointer;">Agree</button>
-            <button id="disagreeBtn" style="background-color: #dc3545; color: white; border: none; padding: 12px 25px; margin: 10px; border-radius: 5px; font-size: 16px; cursor: pointer;">Disagree</button>
-        </div>
-    </div>
-    <script>
-        document.getElementById('agreeBtn').addEventListener('click', function() {
-            alert('Thank you for agreeing to the Security Policy.');
-            window.location.href = 'index.php';
-        });
-        document.getElementById('disagreeBtn').addEventListener('click', function() {
-            alert('You must agree to the Security Policy to use our services.');
-            // Stay on the same page if disagree
-        });
-    </script>
-<!-- <?php include 'includes/footer.php'; ?> -->
-</body>
-</html>
+declare(strict_types=1);
+$legalPage=['title'=>'Security Policy','eyebrow'=>'Security and responsible use','summary'=>'How Valtoria approaches account protection, manual financial operations, payment-card handling, incident response, and responsible reporting.','notice_title'=>'Protect sensitive card information','notice'=>'Manual processing does not remove payment-card security obligations. Never submit complete card details outside a specifically designated secure channel, and never send a card security code by email or support message.','sections'=>[
+['number'=>'01','id'=>'approach','title'=>'Our security approach','content'=>'<p>Valtoria applies layered controls intended to reduce unauthorized access, fraud, data loss, and operational error. Controls are selected based on risk and may include access restrictions, secure development, audit records, session protection, transaction review, reconciliation, backups, monitoring, and incident procedures.</p><p>No system can promise absolute security. This is not a certification or a claim that a named standard has been independently audited.</p>'],
+['number'=>'02','id'=>'account','title'=>'Account protection','content'=>'<ul><li>Passwords are handled with one-way password hashing.</li><li>Authenticated actions use session and request-integrity controls.</li><li>Administrative functions are limited by role and permission.</li><li>Sensitive operations and status changes should produce traceable records.</li><li>Suspicious access may be limited, reviewed, or blocked.</li></ul><p>If email one-time codes or another control is unavailable or not correctly configured, it should remain disabled rather than be represented as active.</p>'],
+['number'=>'03','id'=>'operations','title'=>'Manual operation controls','content'=>'<p>Funding, transfer, credit, and repayment requests may enter a manual operations queue. Authorized personnel move requests through pending, processing, completed, or failed states. Completion must correspond to an operational decision and appropriate ledger entry; changing a label alone is not sufficient.</p><p>Approval thresholds, supporting evidence, idempotency, reconciliation, and immutable corrections should match the risk. Manual processing is not permission to bypass controls.</p>'],
+['number'=>'04','id'=>'card-data','title'=>'Payment-card data','content'=>'<p>Routine records should contain only permitted metadata such as network, last four digits, cardholder label, justified expiry information, and partner or operation reference. Displayed card numbers must be masked except for a documented business need.</p><div class="legal-callout"><strong>Card security codes must not be stored after authorization—even if encrypted.</strong> Full card details must not appear in logs, analytics, notifications, email, support tickets, exports, screenshots, or general notes.</div><p>If a partner operation requires complete card information, collection and transmission must use a separately reviewed, access-controlled, auditable, PCI DSS-aligned channel with defined retention and deletion rules. Manual handling is not an exception.</p>'],
+['number'=>'05','id'=>'data','title'=>'Data and infrastructure safeguards','content'=>'<p>Controls should include encrypted transport, secure configuration, patch management, least privilege, secret separation, protected backups, sensitive-field redaction, and recovery testing. Production credentials and data must remain separate from development and test environments.</p><p>We do not describe a control as enabled, certified, or externally monitored unless it is implemented and verified.</p>'],
+['number'=>'06','id'=>'customer','title'=>'What you should do','content'=>'<ul><li>Use a unique password and secure your email and devices.</li><li>Use a trusted bookmark or type the site address before signing in.</li><li>Never share passwords or one-time codes, including with support.</li><li>Review beneficiary, amount, fee, and status for each request.</li><li>Report unfamiliar activity immediately and preserve references.</li></ul>'],
+['number'=>'07','id'=>'incident','title'=>'Incident response','content'=>'<p>Suspected incidents are triaged, contained, investigated, documented, and remediated based on severity. We may restrict an account or operation during investigation. Affected users, partners, authorities, or regulators will be notified when applicable law or an agreement requires it.</p>'],
+['number'=>'08','id'=>'reporting','title'=>'Responsible vulnerability reporting','content'=>'<p>Report a clear description, affected feature, reproduction steps, and impact. Avoid accessing other users’ data, changing balances, disrupting service, social engineering, high-volume testing, or collecting unnecessary data.</p><p>This policy does not itself authorize testing. Wait for written scope and authorization before intrusive tests.</p>'],
+['number'=>'09','id'=>'scope','title'=>'Scope, partners, and review','content'=>'<p>Partners and providers are responsible for security in their own systems and contractual scope. Compatibility with a partner card program does not establish network endorsement, certification, or a direct network relationship.</p><p>We review this policy as the service, threats, and obligations evolve. Operational claims should be added only after controls are implemented.</p>']]];
+require __DIR__.'/includes/legal_page.php';

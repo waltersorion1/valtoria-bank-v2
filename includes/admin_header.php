@@ -7,6 +7,7 @@ $adminTitle = $adminTitle ?? 'Operations';
 $adminNav = [
  ['dashboard','dashboard.php','Overview','dashboard.view'],
  ['customers','customers.php','Customers & KYC','customers.view'],
+ ['approvals','approvals.php','Account approvals','customers.manage'],
  ['cards','cards.php','Card operations','cards.view'],
  ['transactions','transactions.php','Money movement','transactions.view'],
  ['credit','credit-applications.php','Credit','credit.view'],

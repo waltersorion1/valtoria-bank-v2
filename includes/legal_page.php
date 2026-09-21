@@ -1,0 +1,11 @@
+<?php
+declare(strict_types=1);
+if (!isset($legalPage) || !is_array($legalPage)) throw new RuntimeException('Legal page content is required.');
+$pageTitle = ($legalPage['title'] ?? 'Legal') . ' | Valtoria Bank';
+require __DIR__ . '/public_header.php';
+$updated = $legalPage['updated'] ?? 'September 21, 2026';
+?>
+<link rel="stylesheet" href="assets/css/legal.css">
+<section class="legal-hero"><div class="container legal-hero-grid"><div><div class="eyebrow"><?=e($legalPage['eyebrow']??'Legal center')?></div><h1><?=e($legalPage['title'])?></h1><p class="hero-copy"><?=e($legalPage['summary'])?></p><div class="legal-meta"><span>Last updated <?=e($updated)?></span><span>Effective <?=e($updated)?></span></div></div><aside class="legal-highlight" aria-label="Important notice"><strong><?=e($legalPage['notice_title'])?></strong><p><?=e($legalPage['notice'])?></p></aside></div></section>
+<section class="legal-shell container"><aside class="legal-nav" aria-label="On this page"><strong>On this page</strong><nav><?php foreach($legalPage['sections'] as $section):?><a href="#<?=e($section['id'])?>"><?=e($section['title'])?></a><?php endforeach?></nav><div class="legal-related"><strong>Related policies</strong><a href="privacy-policy.php">Privacy</a><a href="terms.php">Terms</a><a href="cookie-policy.php">Cookies</a><a href="security-policy.php">Security</a></div></aside><article class="legal-document"><?php foreach($legalPage['sections'] as $section):?><section id="<?=e($section['id'])?>" class="legal-section"><span class="legal-section-number"><?=e($section['number'])?></span><div><h2><?=e($section['title'])?></h2><?=$section['content']?></div></section><?php endforeach?><div class="legal-contact"><div><span class="eyebrow">Questions or concerns</span><h2>Contact the right team</h2><p>For account-specific matters, sign in and use secure support. Do not send passwords, one-time codes, full card numbers, or security codes through general contact forms or email.</p></div><div class="hero-actions"><?php if(isLoggedIn()&&!isAdmin()):?><a class="button button-primary" href="user/support.php">Secure support</a><?php endif?><a class="button button-secondary" href="contact.php">General contact</a></div></div></article></section>
+<?php require __DIR__ . '/public_footer.php'; ?>

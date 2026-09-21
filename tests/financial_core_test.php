@@ -16,18 +16,20 @@ $senderId=(int)$sender['user_id'];$recipientId=(int)$recipient['user_id'];
 $pdo->prepare("UPDATE users SET kyc_status='verified',created_at=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 60 DAY) WHERE user_id=?")->execute([$senderId]);
 
 $cards = new CardService($pdo);
-$cardId = $cards->addSandboxCard($senderId, 'visa', '4242', 'TEST CUSTOMER', 12, (int)gmdate('Y')+2);
+$cardId = $cards->submitForReview($senderId, 'visa', '4242', 'TEST CUSTOMER', 12, (int)gmdate('Y')+2, 'TEST-PARTNER-REF');
 assertTrue($cardId > 0, 'token-only Visa metadata created');
+$pdo->prepare("UPDATE linked_cards SET verification_status='verified',verified_at=UTC_TIMESTAMP() WHERE card_id=?")->execute([$cardId]);
 $stored=$pdo->prepare('SELECT provider_payment_method_token,last_four FROM linked_cards WHERE card_id=?');$stored->execute([$cardId]);$stored=$stored->fetch();
-assertTrue(str_starts_with($stored['provider_payment_method_token'],'sbox_pm_') && $stored['last_four']==='4242', 'no PAN or CVV stored');
+assertTrue(str_starts_with($stored['provider_payment_method_token'],'manual_ref_') && $stored['last_four']==='4242', 'no PAN or CVV stored');
 try { $cards->ownedActiveCard($recipientId, $cardId); assertTrue(false, 'reject card ownership mismatch'); } catch (RuntimeException) { echo "PASS: reject card ownership mismatch\n"; }
 
-$funding = new FundingService($pdo,new SandboxCardFundingProvider());
+$adminId=(int)$pdo->query('SELECT user_id FROM users WHERE is_admin=1 ORDER BY user_id LIMIT 1')->fetchColumn();
+$operations=new FinancialService($pdo);
+$funding = new FundingService($pdo,new ManualCardFundingProvider());
 $f1=$funding->fund($senderId,$cardId,20000,'test-fund-1');
 $f1Again=$funding->fund($senderId,$cardId,20000,'test-fund-1');
 assertTrue((int)$f1['transaction_id']===(int)$f1Again['transaction_id'],'funding idempotency returns original transaction');
-$funding->fund($senderId,$cardId,1000,'test-fund-2');
-$funding->fund($senderId,$cardId,1000,'test-fund-3');
+foreach([$f1,$funding->fund($senderId,$cardId,1000,'test-fund-2'),$funding->fund($senderId,$cardId,1000,'test-fund-3')] as $request){$operations->review($request['reference'],'processing',$adminId,'Integration initial review');$operations->review($request['reference'],'completed',$adminId,'Partner completion confirmed');}
 
 $pdo->prepare("INSERT INTO beneficiaries(user_id,display_name,destination_account_number) VALUES(?, 'TEST RECIPIENT', ?) ON DUPLICATE KEY UPDATE beneficiary_id=LAST_INSERT_ID(beneficiary_id),status='active'")->execute([$senderId,$recipient['account_number']]);
 $beneficiaryId=(int)$pdo->lastInsertId();
@@ -40,10 +42,11 @@ $before=$pdo->prepare('SELECT account_id,balance_cents FROM accounts WHERE accou
 $tr=$transfer->transfer($senderId,$beneficiaryId,5000,'Integration test','test-transfer-1');
 $trAgain=$transfer->transfer($senderId,$beneficiaryId,5000,'Integration test','test-transfer-1');
 assertTrue((int)$tr['transaction_id']===(int)$trAgain['transaction_id'],'transfer idempotency returns original transaction');
+$operations->review($tr['reference'],'processing',$adminId,'Integration initial review');
+$operations->review($tr['reference'],'completed',$adminId,'Partner completion confirmed');
 $after=$pdo->prepare('SELECT account_id,balance_cents FROM accounts WHERE account_id IN (?,?) ORDER BY account_id');$after->execute([$sender['account_id'],$recipient['account_id']]);$afterRows=$after->fetchAll(PDO::FETCH_KEY_PAIR);
 assertTrue((int)$beforeRows[$sender['account_id']]-(int)$afterRows[$sender['account_id']]===5050,'sender debited amount plus server fee');
 assertTrue((int)$afterRows[$recipient['account_id']]-(int)$beforeRows[$recipient['account_id']]===5000,'recipient credited exact amount');
-$adminId=(int)$pdo->query('SELECT user_id FROM users WHERE is_admin=1 ORDER BY user_id LIMIT 1')->fetchColumn();
 $reversal=(new FinancialService($pdo))->reverse($tr['reference'],$adminId,'Integration reversal test');
 assertTrue($reversal['status']==='completed','transfer reversal posts an immutable correcting transaction');
 
