@@ -315,7 +315,7 @@ $totalOverdue = $overdue['total_overdue'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Bank - Loans</title>
+    <title>Credit | Valtoria Bank</title>
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/css/loans.css">
 

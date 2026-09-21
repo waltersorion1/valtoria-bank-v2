@@ -116,7 +116,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verification Pending - Nexus E-Banking</title>
+    <title>Verification pending | Valtoria Bank</title>
     <link rel="stylesheet" href="./assets/css/main.css">
     <style>
         .pending-container {
@@ -211,4 +211,4 @@ try {
         checkVerificationStatus();
     </script>
 </body>
-</html> 
+</html>

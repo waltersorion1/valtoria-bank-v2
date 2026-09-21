@@ -86,7 +86,7 @@ $profilePic = $user['profile_picture'] ? '../uploads/' . $user['profile_picture'
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus-Banksystem - Dashboard</title>
+    <title>Account overview | Valtoria Bank</title>
     <link rel="stylesheet" href="../assets/css/main.css">
     <script src="../assets/js/session.js"></script>
 
@@ -176,7 +176,7 @@ $profilePic = $user['profile_picture'] ? '../uploads/' . $user['profile_picture'
                 <aside class="sidebar">                   
                              
                 <div class="Logos-cont">
-                    <img src="../assets/images/Logo-color.png" alt="SecureBank Logo" class="logo-container">
+                    <span class="valtoria-wordmark">Valtoria Bank</span>
                 </div>
                 
                 <hr>

@@ -1,0 +1,10 @@
+.env
+mail_debug.log
+/storage/logs/*.log
+/storage/cache/*
+/storage/sessions/*
+/uploads/*
+!/uploads/.htaccess
+!/uploads/index.html
+!/uploads/id_verifications/.gitkeep
+!/uploads/loan_verifications/.gitkeep

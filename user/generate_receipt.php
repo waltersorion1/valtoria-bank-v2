@@ -108,8 +108,8 @@ $currency = 'PHP';
 $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
 
 // Document metadata
-$pdf->SetCreator('Nexus Bank');
-$pdf->SetAuthor('Nexus Bank');
+$pdf->SetCreator('Valtoria Bank');
+$pdf->SetAuthor('Valtoria Bank');
 $pdf->SetTitle('Transaction Receipt');
 
 // Disable default header/footer
@@ -361,9 +361,8 @@ $pdf->SetFont($fontNormal, '', 9);
 
 // We manually insert line breaks to avoid automatic wrapping outside margins.
 $promoText = 
-    "Enjoy a better life with Nexus Bank. Get free transfers, withdrawals, bill payments, instant\n" .
-    "loans, and competitive annual interest on your savings. Nexus Bank is licensed by the\n" .
-    "Bangko Sentral ng Pilipinas and insured by the PDIC.";
+    "Keep this receipt for your records. Transaction availability and completion are shown by\n" .
+    "the status and reference above. Contact Valtoria Bank support if you do not recognize it.";
 
 $pdf->MultiCell(
     0,            // full width

@@ -1,15 +1,14 @@
 <?php
-session_start();
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
 require_once 'includes/send_reset_mail.php'; // Make sure this exists
 
-date_default_timezone_set('Asia/Manila'); // Sync PHP timezone with your DB
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
     $email = $_POST['email'] ?? '';
     $token = bin2hex(random_bytes(32));
-    $expires = date('Y-m-d H:i:s', time() + 3600); // 1 hour from now
+    $tokenDigest = hash('sha256', $token);
+    $expires = date('Y-m-d H:i:s', time() + 3600);
 
     $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
     $stmt->execute([$email]);
@@ -17,9 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user) {
         $pdo->prepare("UPDATE users SET reset_token = ?, reset_expires_at = ? WHERE user_id = ?")
-            ->execute([$token, $expires, $user['user_id']]);
+            ->execute([$tokenDigest, $expires, $user['user_id']]);
 
-            $resetLink = "http://localhost/Nexus-Banksystem/reset-password.php?token=$token";
+            $resetLink = config('app.url') . "/reset-password.php?token=" . rawurlencode($token);
 
         
         if (sendResetLink($email, $resetLink)) {
@@ -28,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['error'] = "Failed to send email.";
         }
     } else {
-        $_SESSION['error'] = "Email not found.";
+        $_SESSION['success'] = "If that address belongs to an account, a reset link has been sent.";
     }
 
     header('Location: forgot-password.php');
@@ -60,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <?php endif; ?>
 
       <form method="post">
+        <?= csrfField() ?>
         <input type="email" name="email" placeholder="Enter your email" required />
         <button type="submit">Send Reset Link</button>
       </form>

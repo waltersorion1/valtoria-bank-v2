@@ -1,20 +1,14 @@
 <?php
-session_start();
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
-
-date_default_timezone_set('Asia/Manila'); // Same timezone as before
 
 $token = $_GET['token'] ?? '';
 if (!$token) {
     die("Missing token.");
 }
 
-// DEBUG
-error_log("Checking token: $token at " . date('Y-m-d H:i:s'));
-
 $stmt = $pdo->prepare("SELECT * FROM users WHERE reset_token = ?");
-$stmt->execute([$token]);
+$stmt->execute([hash('sha256', $token)]);
 $user = $stmt->fetch();
 
 if (!$user) {
@@ -28,6 +22,7 @@ if ($expires < time()) {
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
     $newPass = $_POST['password'] ?? '';
     $confirm = $_POST['confirm_password'] ?? '';
 
@@ -63,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <?php endif; ?>
 
       <form method="post">
+        <?= csrfField() ?>
         <input type="password" name="password" placeholder="New password" required />
         <input type="password" name="confirm_password" placeholder="Confirm password" required />
         <button type="submit">Reset Password</button>

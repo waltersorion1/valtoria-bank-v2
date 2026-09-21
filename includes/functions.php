@@ -1,7 +1,8 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/bootstrap.php';
 
 function sanitizeInput($data) {
     return htmlspecialchars(stripslashes(trim($data)), ENT_QUOTES, 'UTF-8');
@@ -18,7 +19,16 @@ function isLoggedIn() {
 }
 
 function isAdmin() {
-    return isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
+    return isset($_SESSION['is_admin']) && (int) $_SESSION['is_admin'] === 1;
+}
+
+function currentRole(): string {
+    if (!isLoggedIn()) return 'guest';
+    return $_SESSION['role'] ?? (isAdmin() ? 'super_admin' : 'customer');
+}
+
+function hasRole(string ...$roles): bool {
+    return in_array(currentRole(), $roles, true);
 }
 
 // Add all other original functions here
@@ -34,6 +44,14 @@ function redirectIfNotAdmin() {
     if (!isAdmin()) {
         header("Location: ../user/dashboard.php");
         exit();
+    }
+}
+
+function requireRole(string ...$roles): void {
+    redirectIfNotLoggedIn();
+    if (!hasRole(...$roles)) {
+        http_response_code(403);
+        exit('You do not have permission to access this area.');
     }
 }
 
@@ -53,7 +71,7 @@ function generateUniqueAccountNumber($pdo) {
 
 
 function formatCurrency($amount) {
-    return number_format($amount, 2, '.', ',');
+    return '$' . number_format((float) $amount, 2, '.', ',');
 }
 
 function formatDate($dateString) {
@@ -81,4 +99,3 @@ function getRecentLoginRecords($pdo, $limit = 10) {
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-?>

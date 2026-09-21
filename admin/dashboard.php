@@ -31,7 +31,7 @@ $recentUsers = $pdo->query("SELECT * FROM users ORDER BY created_at DESC LIMIT 5
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecureBank - Admin Dashboard</title>
+    <title>Operations overview | Valtoria Bank</title>
     <link rel="stylesheet" href="../assets/css/admin-main.css">
     <link rel="stylesheet" href="../assets/css/admin-dashboard.css">
 
@@ -43,7 +43,7 @@ $recentUsers = $pdo->query("SELECT * FROM users ORDER BY created_at DESC LIMIT 5
         <aside class="sidebar">
             
                 <div class="Logos-cont">
-                    <img src="../assets/images/Logo-color.png" alt="SecureBank Logo" class="logo-container">
+                    <span class="valtoria-wordmark">Valtoria Operations</span>
                 </div>
 
                 <nav class="dashboard-nav">

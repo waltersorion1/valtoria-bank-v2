@@ -8,7 +8,7 @@ require_once __DIR__ . '/includes/functions.php';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Terms and Conditions - Nexus Bank</title>
+    <title>Terms and Conditions | Valtoria Bank</title>
     <link rel="stylesheet" href="assets/css/style.css" />
     <style>
         body, html {
@@ -67,11 +67,11 @@ require_once __DIR__ . '/includes/functions.php';
     <div class="container">
         <div class="sticker"></div>
         <h1>Terms and Conditions</h1>
-        <p>Welcome to Nexus Bank. By using our services, you agree to the following terms and conditions.</p>
+        <p>Welcome to Valtoria Bank. By using our services, you agree to the following terms and conditions.</p>
         <p>1. Account Usage: You agree to use your account responsibly and keep your credentials confidential.</p>
-        <p>2. Transactions: All transactions are subject to verification and approval by Nexus Bank.</p>
+        <p>2. Transactions: Transactions may be subject to verification, limits, and availability.</p>
         <p>3. Privacy: We respect your privacy and handle your data according to our Privacy Policy.</p>
-        <p>4. Liability: Nexus Bank is not liable for any unauthorized access or loss of funds due to negligence.</p>
+        <p>4. Account security: Customers must protect credentials and promptly report suspected unauthorized activity.</p>
         <p>5. Changes: We reserve the right to update these terms at any time. Continued use of our services constitutes acceptance of changes.</p>
         <p>For full details, please contact our support team.</p>
         <div style="max-width: 900px; margin-left: auto; margin-right: auto; text-align: center; margin-top: 20px;">

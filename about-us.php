@@ -8,7 +8,7 @@ require_once __DIR__ . '/includes/functions.php';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TrustBank | About Us</title>
+    <title>About | Valtoria Bank</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         :root {
@@ -323,8 +323,8 @@ require_once __DIR__ . '/includes/functions.php';
         <div class="container">
             <nav>
                 <div class="nav-left">
-                    <a href="index.php" class="logo" aria-label="TrustBank Home">
-                        <img src="assets/images/Logo-color-1.png" alt="Nexus Bank logo" />
+                    <a href="index.php" class="logo" aria-label="Valtoria Bank Home">
+                        <img src="assets/images/Logo-color-1.png" alt="Valtoria Bank logo" />
                     </a>
                 </div>
                 <div class="nav-links" id="nav-links">
@@ -352,7 +352,7 @@ require_once __DIR__ . '/includes/functions.php';
     <section class="page-title">
         <div class="container">
             <h1>About Us</h1>
-            <p>Learn more about Nexus Bank — our mission, vision, and commitment to serving you.</p>
+            <p>Learn more about Valtoria Bank—our mission, vision, and commitment to serving you.</p>
         </div>
     </section>
 
@@ -361,13 +361,13 @@ require_once __DIR__ . '/includes/functions.php';
         <div class="container">
             <h2>Our Story</h2>
             <p>
-                Since 2019, Nexus Bank has been committed to providing trustworthy and innovative financial services. 
+                Valtoria Bank is building clear, controlled financial services for customers across multiple regions.
                 Our mission is to empower individuals and businesses to achieve their financial goals through personalized solutions, 
                 cutting-edge technology, and a dedicated team of experts.
             </p>
             <p>
                 We believe in building lasting relationships with our clients based on transparency, integrity, and mutual success. 
-                Whether you're saving for the future, investing, or managing daily finances, Nexus Bank is here to guide you every step of the way.
+                Whether you are managing cards or everyday activity, Valtoria Bank is designed to keep each step understandable.
             </p>
             <h2>Our Vision</h2>
             <p>
@@ -390,10 +390,10 @@ require_once __DIR__ . '/includes/functions.php';
             <hr style="border: none; height: 1px; background-color: rgba(255, 255, 255, 0.1); margin: 20px 0;" />
             <div class="footer-grid">
                 <div class="footer-col">
-                    <h3>Nexus Bank</h3>
+                    <h3>Valtoria Bank</h3>
                     <p>Where money meets trust. Providing reliable banking services since 2019.</p>
                     <div class="contact-info" style="color: var(--light-gray); font-size: 16px; margin-top: 20px; white-space: nowrap;">
-                        <p>📧 Email: Nexus-Banksystem@gmail.com</p>
+                        <p>Email: support details are configured per deployment.</p>
                         <p>📞 Phone: 09564282978</p>
                     </div>
                 </div>
@@ -417,7 +417,7 @@ require_once __DIR__ . '/includes/functions.php';
             </div>
             <hr style="border: none; height: 1px; background-color: rgba(255, 255, 255, 0.1); margin: 20px 0;" />
             <div class="copyright">
-                &copy; 2025 Nexus Bank. All rights reserved.
+                &copy; <?= date('Y') ?> Valtoria Bank. All rights reserved.
             </div>
             <hr style="border: none; height: 1px; background-color: rgba(255, 255, 255, 0.1); margin: 20px 0 0 0;" />
         </div>

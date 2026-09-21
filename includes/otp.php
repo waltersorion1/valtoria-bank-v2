@@ -18,13 +18,11 @@ function generateOTP($email) {
             ->execute([$email]);
         
         // Insert new OTP with UTC timestamp
+        $otpDigest = hash('sha256', $email . ':' . $otp);
         $stmt = $pdo->prepare("INSERT INTO otp_verification 
                             (email, otp, expires_at, is_used)
                             VALUES (?, ?, ?, 0)");
-        $stmt->execute([$email, $otp, $expiresAt]);
-        
-        // Debug logging
-        error_log("Generated OTP for $email: $otp (Expires: $expiresAt)");
+        $stmt->execute([$email, $otpDigest, $expiresAt]);
         
         // Try to send OTP and log the result
         $sendResult = sendOTP($email, $otp);
@@ -54,25 +52,22 @@ function verifyOTP($email, $otp) {
     }
 
     try {
-        // Use UTC time comparison and case-insensitive email match
+        $otpDigest = hash('sha256', $email . ':' . $otp);
         $stmt = $pdo->prepare("SELECT * FROM otp_verification 
                             WHERE LOWER(email) = ?
                             AND otp = ?
                             AND expires_at > UTC_TIMESTAMP()
                             AND is_used = 0");
-        $stmt->execute([$email, $otp]);
+        $stmt->execute([$email, $otpDigest]);
         
         if ($stmt->fetch()) {
             // Immediately mark as used
             $pdo->prepare("UPDATE otp_verification SET is_used = 1 
                          WHERE LOWER(email) = ? AND otp = ?")
-                ->execute([$email, $otp]);
-            
-            error_log("OTP verification successful for $email");
+                ->execute([$email, $otpDigest]);
             return true;
         }
         
-        error_log("OTP verification failed for $email");
         return false;
         
     } catch (PDOException $e) {

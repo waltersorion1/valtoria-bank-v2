@@ -194,7 +194,7 @@ $profilePic = $user['profile_picture'] ? '../uploads/' . $user['profile_picture'
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SecureBank - Loan Payment</title>
+    <title>Credit payment | Valtoria Bank</title>
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/css/pay-loan.css">
 

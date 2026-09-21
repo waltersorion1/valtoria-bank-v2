@@ -49,14 +49,14 @@ try {
         $pdo->commit();
 
         // Send confirmation email
-        $subject = "Login Confirmed - Nexus E-Banking";
+        $subject = "Sign-in confirmed - Valtoria Bank";
         $body = "Hello,<br><br>"
-              . "You have successfully verified your login to Nexus E-Banking.<br>"
+              . "You have successfully verified your sign-in to Valtoria Bank.<br>"
               . "Login details:<br>"
               . "IP Address: " . htmlspecialchars($verification['ip_address'] ?? 'Unknown') . "<br>"
               . "Browser: " . htmlspecialchars($verification['user_agent'] ?? 'Unknown') . "<br><br>"
               . "If this wasn't you, please contact support immediately.<br><br>"
-              . "Thank you,<br>Nexus Bank";
+              . "Thank you,<br>Valtoria Bank";
         sendNotification($verification['email'], $subject, $body);
 
         // Show success message
@@ -66,7 +66,7 @@ try {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Login Verified - Nexus E-Banking</title>
+            <title>Sign-in verified | Valtoria Bank</title>
             <link rel="stylesheet" href="./assets/css/main.css">
             <style>
                 .success-container {
@@ -115,7 +115,7 @@ try {
         // Send security alert email
         $subject = "Security Alert - Unauthorized Login Attempt";
         $body = "Hello,<br><br>"
-              . "You have indicated that you did not attempt to log in to your Nexus E-Banking account.<br>"
+              . "You have indicated that you did not attempt to sign in to your Valtoria Bank account.<br>"
               . "Login attempt details:<br>"
               . "IP Address: " . htmlspecialchars($verification['ip_address'] ?? 'Unknown') . "<br>"
               . "Browser: " . htmlspecialchars($verification['user_agent'] ?? 'Unknown') . "<br><br>"
@@ -123,7 +123,7 @@ try {
               . "If you did not attempt to log in, we recommend:<br>"
               . "1. Change your password immediately<br>"
               . "2. Contact our support team<br><br>"
-              . "Thank you,<br>Nexus Bank";
+              . "Thank you,<br>Valtoria Bank";
         sendNotification($verification['email'], $subject, $body);
 
         header("Location: login.php?error=unauthorized_login");

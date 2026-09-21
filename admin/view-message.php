@@ -49,6 +49,7 @@ try {
 
     // Handle status update
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['status'])) {
+        requireCsrf();
         $newStatus = $_POST['status'];
         if (in_array($newStatus, ['read', 'replied'])) {
             $updateStmt = $pdo->prepare("UPDATE contact_messages SET status = ? WHERE id = ?");
@@ -60,32 +61,12 @@ try {
 
     // Handle reply submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reply_message'])) {
+        requireCsrf();
         $reply_message = $_POST['reply_message'];
-        
-        // Initialize PHPMailer
-        $mail = new PHPMailer\PHPMailer\PHPMailer(true);
-        
         try {
-            // Server settings
-            $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'nexusbanksystem@gmail.com';
-            $mail->Password   = 'ntnl ttfo uayi vsxd';
-            $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
-
-            // Recipients
-            $mail->setFrom('nexusbanksystem@gmail.com', 'Nexus Bank');
-            $mail->addAddress($message['email'], $message['name']);
-
-            // Content
-            $mail->isHTML(true);
-            $mail->Subject = 'Re: ' . $message['subject'];
-            $mail->Body    = nl2br($reply_message);
-            $mail->AltBody = strip_tags($reply_message);
-
-            $mail->send();
+            if (!sendMailMessage($message['email'], 'Re: ' . $message['subject'], nl2br(e($reply_message)), $reply_message)) {
+                throw new RuntimeException('Mail delivery is unavailable.');
+            }
             
             // Update message status to replied
             $updateStmt = $pdo->prepare("UPDATE contact_messages SET status = 'replied' WHERE id = ?");
@@ -93,8 +74,8 @@ try {
             
             $reply_sent = true;
         } catch (Exception $e) {
-            $reply_error = "Failed to send reply: " . $mail->ErrorInfo;
-            error_log("Mail Error: " . $mail->ErrorInfo);
+            $reply_error = "The reply could not be sent. Check the mail configuration.";
+            error_log("Mail reply error: " . $e->getMessage());
         }
     }
 } catch (PDOException $e) {
@@ -301,6 +282,7 @@ try {
 
                     <div class="message-actions">
                         <form method="POST" class="status-form">
+                            <?= csrfField() ?>
                             <input type="hidden" name="status" value="replied">
                             <button type="submit" class="btn btn-success">Mark as Replied</button>
                         </form>
@@ -323,6 +305,7 @@ try {
                 <p>Subject: Re: <?php echo htmlspecialchars($message['subject']); ?></p>
             </div>
             <form method="POST" class="reply-form">
+                <?= csrfField() ?>
                 <textarea name="reply_message" placeholder="Type your reply here..." required></textarea>
                 <button type="submit" class="btn btn-primary">Send Reply</button>
             </form>
@@ -347,4 +330,4 @@ try {
         }
     </script>
 </body>
-</html> 
+</html>

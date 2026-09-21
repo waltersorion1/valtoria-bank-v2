@@ -3,10 +3,10 @@
         <hr style="border: none; height: 1px; background-color: rgba(255, 255, 255, 0.1); margin: 20px 0;" />
         <div class="footer-grid">
             <div class="footer-col">
-                <h3>Nexus Bank</h3>
+                <h3>Valtoria Bank</h3>
                 <p>Where money meets trust. Providing reliable banking services since 1995.</p>
                 <div class="contact-info" style="color: var(--light-gray); font-size: 16px; margin-top: 20px; white-space: nowrap;">
-                    <p>📧 Email: Nexus-Banksystem@gmail.com</p>
+                    <p>Email: support details are configured per deployment.</p>
                     <p>📞 Phone: 09564282978</p>
                 </div>
             </div>
@@ -30,7 +30,7 @@
         </div>
         <hr style="border: none; height: 1px; background-color: rgba(255, 255, 255, 0.1); margin: 20px 0;" />
         <div class="copyright">
-            &copy; 2025 Nexus Bank. All rights reserved.
+            &copy; <?= date('Y') ?> Valtoria Bank. All rights reserved.
         </div>
         <hr style="border: none; height: 1px; background-color: rgba(255, 255, 255, 0.1); margin: 20px 0 0 0;" />
     </div>

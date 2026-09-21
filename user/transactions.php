@@ -113,7 +113,7 @@ $profilePic = $user['profile_picture'] ? '../uploads/' . $user['profile_picture'
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecureBank - Transactions</title>
+    <title>Transactions | Valtoria Bank</title>
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/css/transaction.css">
 

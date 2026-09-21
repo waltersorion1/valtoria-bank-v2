@@ -8,7 +8,7 @@ require_once __DIR__ . '/includes/functions.php';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Privacy Policy - Nexus Bank</title>
+    <title>Privacy Policy | Valtoria Bank</title>
     <link rel="stylesheet" href="assets/css/style.css" />
     <style>
         body, html {
@@ -67,7 +67,7 @@ require_once __DIR__ . '/includes/functions.php';
     <div class="container">
         <div class="sticker"></div>
         <h1>Privacy Policy</h1>
-        <p>At Nexus Bank, we are committed to protecting your privacy and personal information.</p>
+        <p>At Valtoria Bank, we are committed to handling personal information carefully and transparently.</p>
         <p>1. Information Collection: We collect information necessary to provide and improve our services.</p>
         <p>2. Use of Information: Your data is used only for legitimate banking purposes and not shared without consent.</p>
         <p>3. Security: We implement robust security measures to safeguard your information.</p>

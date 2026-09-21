@@ -1,11 +1,5 @@
 <?php
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-session_start();
-
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/otp.php';
@@ -61,6 +55,7 @@ if ($redirect) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
     $submittedOTP = $_POST['otp'] ?? '';
 
     try {
@@ -79,7 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $pdo->prepare("INSERT INTO accounts (user_id, account_number) VALUES (?, ?)")
                         ->execute([$user['user_id'], $accountNumber]);
 
+                    regenerateSession();
                     $_SESSION['user_id'] = $user['user_id'];
+                    $_SESSION['role'] = 'customer';
                     unset($_SESSION['temp_email']);
 
                     header("Location: user/dashboard.php");
@@ -101,8 +98,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $user = $stmt->fetch();
 
                 if ($user && verifyOTP($user['email'], $submittedOTP)) {
+                    regenerateSession();
                     $_SESSION['user_id'] = $user_id;
                     $_SESSION['is_admin'] = $is_admin;
+                    $_SESSION['role'] = (int) $is_admin === 1 ? 'super_admin' : 'customer';
                     unset($_SESSION['temp_user_id'], $_SESSION['temp_is_admin']);
 
                     // Delete any existing tokens for this user
@@ -130,16 +129,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $denyUrl = $baseUrl . "/verify-login.php?token=" . urlencode($verificationToken) . "&action=deny";
                     
                     // Send verification email
-                    $subject = "Verify Your Login - Nexus E-Banking";
+                    $subject = "Verify your Valtoria Bank sign-in";
                     $body = "Hello,<br><br>"
-                          . "A login attempt was made to your Nexus E-Banking account.<br>"
+                          . "A login attempt was made to your Valtoria Bank account.<br>"
                           . "Was this you?<br><br>"
                           . "<div style='text-align: center;'>"
                           . "<a href='" . htmlspecialchars($verifyUrl) . "' style='display: inline-block; margin: 10px; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;'>Yes, it was me</a>"
                           . "<a href='" . htmlspecialchars($denyUrl) . "' style='display: inline-block; margin: 10px; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px;'>No, it wasn't me</a>"
                           . "</div><br>"
                           . "If you did not attempt to log in, please click the 'No' button and change your password immediately.<br><br>"
-                          . "Thank you,<br>Nexus Bank";
+                          . "Thank you,<br>Valtoria Bank";
                     
                     if (sendNotification($user['email'], $subject, $body)) {
                         header("Location: verify-pending.php");
@@ -217,7 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $body = "Hello,<br><br>"
                                   . "You received <strong>$" . number_format($transfer['amount'], 2) . "</strong> from account <strong>{$fromAccount['account_number']}</strong>.<br><br>"
                                   . "Description: <em>" . htmlspecialchars($descIn) . "</em><br><br>"
-                                  . "Thank you,<br>Nexus Bank";
+                                  . "Thank you,<br>Valtoria Bank";
                             sendNotification($recipientEmail, $subject, $body);
                         }
 
@@ -226,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $bodySender = "Hello,<br><br>"
                                     . "You successfully transferred <strong>$" . number_format($transfer['amount'], 2) . "</strong> to account <strong>{$transfer['to_account']}</strong>.<br><br>"
                                     . "Description: <em>" . htmlspecialchars($descOut) . "</em><br><br>"
-                                    . "Thank you,<br>Nexus Bank";
+                                    . "Thank you,<br>Valtoria Bank";
                         sendNotification($user['email'], $subjectSender, $bodySender);
 
                         $_SESSION['flash_success'] = "Successfully transferred $" . number_format($transfer['amount'], 2);
@@ -279,7 +278,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $subject = "Withdrawal Successful";
                         $body = "Hello,<br><br>"
                               . "You have successfully withdrawn <strong>$" . number_format($withdraw['amount'], 2) . "</strong> from your account.<br><br>"
-                              . "Thank you,<br>Nexus Bank";
+                              . "Thank you,<br>Valtoria Bank";
                         sendNotification($user['email'], $subject, $body);
 
                         $_SESSION['flash_success'] = "Successfully withdrawn $" . number_format($withdraw['amount'], 2);
@@ -329,7 +328,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $subject = "Deposit Successful";
                         $body = "Hello,<br><br>"
                               . "You have successfully deposited <strong>$" . number_format($deposit['amount'], 2) . "</strong> into your account.<br><br>"
-                              . "Thank you,<br>Nexus Bank";
+                              . "Thank you,<br>Valtoria Bank";
                         sendNotification($user['email'], $subject, $body);
 
                         $_SESSION['flash_success'] = "Successfully deposited $" . number_format($deposit['amount'], 2);
@@ -356,13 +355,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>OTP Verification - Nexus E‑Banking</title>
+  <title>Verification | Valtoria Bank</title>
   <link rel="stylesheet" href="./assets/css/main.css">
   <link rel="stylesheet" href="./assets/css/otp.css">
 </head>
 <body>
   <div class="otp-page">
-    <img src="./assets/images/Logo.png" alt="Nexus Logo" class="otp-logo">
+    <span class="valtoria-wordmark">Valtoria Bank</span>
     <div class="otp-card">
 
       <h2 class="otp-title">OTP Verification</h2>
@@ -375,6 +374,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <?php endif; ?>
 
       <form id="otp-form" method="POST" novalidate>
+        <?= csrfField() ?>
         <input type="hidden" name="type" value="<?= htmlspecialchars($type) ?>">
 
         <div class="otp-inputs">

@@ -13,7 +13,7 @@ if (isLoggedIn()) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nexus Bank | Why Choose Us</title>
+  <title>Why Valtoria | Valtoria Bank</title>
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -251,8 +251,8 @@ if (isLoggedIn()) {
   <header>
     <nav>
       <a href="index.php" class="logo">
-        <img src="assets/images/Logo-color-1.png" alt="Nexus Bank Logo" />
-        Nexus Bank
+        <img src="assets/images/Logo-color-1.png" alt="Valtoria Bank logo" />
+        Valtoria Bank
       </a>
       <div class="nav-links">
         <a href="index.php">Home</a>
@@ -269,7 +269,7 @@ if (isLoggedIn()) {
   </header>
 
   <section class="page-title">
-    <h1>Why Choose Nexus Bank?</h1>
+    <h1>Why choose Valtoria Bank?</h1>
     <p>Discover the advantages and benefits of banking with us.</p>
   </section>
 
@@ -311,10 +311,10 @@ if (isLoggedIn()) {
       <hr style="border: none; height: 1px; background-color: rgba(255, 255, 255, 0.1); margin: 20px auto;" />
       <div class="footer-grid">
         <div class="footer-col">
-          <h3>Nexus Bank</h3>
+          <h3>Valtoria Bank</h3>
           <p>Where money meets trust. Providing reliable banking services since 1995.</p>
           <div class="contact-info" style="color: var(--light-gray); font-size: 16px; margin-top: 20px; white-space: nowrap;">
-            <p>📧 Email: Nexus-Banksystem@gmail.com</p>
+            <p>Email: support details are configured per deployment.</p>
             <p>📞 Phone: 09564282978</p>
           </div>
         </div>
@@ -338,7 +338,7 @@ if (isLoggedIn()) {
       </div>
       <hr style="border: none; height: 1px; background-color: rgba(255, 255, 255, 0.1); margin: 20px 0;" />
       <div class="copyright">
-        &copy; 2025 Nexus Bank. All rights reserved.
+        &copy; <?= date('Y') ?> Valtoria Bank. All rights reserved.
       </div>
       <hr style="border: none; height: 1px; background-color: rgba(255, 255, 255, 0.1); margin: 20px 0 0 0;" />
     </div>

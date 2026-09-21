@@ -178,7 +178,7 @@ $profilePic = $user['profile_picture'] ? '../uploads/' . $user['profile_picture'
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SecureBank - Investments</title>
+    <title>Legacy investments | Valtoria Bank</title>
     <link rel="stylesheet" href="../assets/css/investment.css">
     <link rel="stylesheet" href="../assets/css/main.css">
     

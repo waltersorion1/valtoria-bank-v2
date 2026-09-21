@@ -1,6 +1,8 @@
 <?php
 // Include database connection
 require_once '../includes/db.php';
+require_once '../includes/functions.php';
+redirectIfNotAdmin();
 
 try {
     // SQL query to fetch recent transactions with user info via accounts table

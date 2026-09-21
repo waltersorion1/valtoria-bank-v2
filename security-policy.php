@@ -8,7 +8,7 @@ require_once __DIR__ . '/includes/functions.php';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Security Policy - Nexus Bank</title>
+    <title>Security Policy | Valtoria Bank</title>
     <link rel="stylesheet" href="assets/css/style.css" />
     <style>
         body, html {
@@ -67,7 +67,7 @@ require_once __DIR__ . '/includes/functions.php';
     <div class="container">
         <div class="sticker"></div>
         <h1>Security Policy</h1>
-        <p>At Nexus Bank, we prioritize the security of your personal and financial information.</p>
+        <p>At Valtoria Bank, protecting personal and financial information is a core product requirement.</p>
         <p>1. Data Protection: We use advanced encryption and security protocols to protect your data.</p>
         <p>2. Access Control: Only authorized personnel have access to sensitive information.</p>
         <p>3. Fraud Prevention: We monitor accounts for suspicious activity and take immediate action.</p>

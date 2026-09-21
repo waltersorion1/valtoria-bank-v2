@@ -13,7 +13,7 @@ if (isLoggedIn() && isAdmin()) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Contact Us | Nexus Bank</title>
+  <title>Contact | Valtoria Bank</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     :root {
@@ -385,8 +385,8 @@ if (isLoggedIn() && isAdmin()) {
     <div class="container">
       <nav>
         <div class="nav-left">
-          <a href="index.php" class="logo" aria-label="Nexus Bank Home">
-            <img src="assets/images/Logo-color-1.png" alt="Nexus Bank logo" />
+          <a href="index.php" class="logo" aria-label="Valtoria Bank Home">
+            <img src="assets/images/Logo-color-1.png" alt="Valtoria Bank logo" />
           </a>
         </div>
         <div class="nav-links" id="nav-links">
@@ -418,6 +418,7 @@ if (isLoggedIn() && isAdmin()) {
         <h1>Contact Us</h1>
         <p>Have questions or want to get in touch? We're here to help you.</p>
         <form class="contact-form" action="process-contact.php" method="POST" novalidate>
+          <?= csrfField() ?>
           <label for="name">Full Name</label>
           <input type="text" id="name" name="name" required placeholder="Your full name" />
 
@@ -441,10 +442,10 @@ if (isLoggedIn() && isAdmin()) {
         <hr style="border: none; height: 1px; background-color: rgba(255, 255, 255, 0.1); margin: 20px 0;" />
         <div class="footer-grid">
             <div class="footer-col">
-                <h3>Nexus Bank</h3>
+                <h3>Valtoria Bank</h3>
                 <p>Where money meets trust. Providing reliable banking services since 2019.</p>
                 <div class="contact-info" style="color: var(--light-gray); font-size: 16px; margin-top: 20px; white-space: nowrap;">
-                    <p>📧 Email: Nexus-Banksystem@gmail.com</p>
+                    <p>Email: support details are configured per deployment.</p>
                     <p>📞 Phone: 09564282978</p>
                 </div>
             </div>
@@ -468,7 +469,7 @@ if (isLoggedIn() && isAdmin()) {
         </div>
         <hr style="border: none; height: 1px; background-color: rgba(255, 255, 255, 0.1); margin: 20px 0;" />
         <div class="copyright">
-            &copy; 2025 Nexus Bank. All rights reserved.
+            &copy; <?= date('Y') ?> Valtoria Bank. All rights reserved.
         </div>
         <hr style="border: none; height: 1px; background-color: rgba(255, 255, 255, 0.1); margin: 20px 0 0 0;" />
     </div>

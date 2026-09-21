@@ -1,12 +1,4 @@
 <?php
-// Enable full error reporting
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Start session
-session_start();
-
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
 // No OTP required at this stage unless you want OTP after approval
@@ -27,6 +19,7 @@ $data = [
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
     // Sanitize and validate inputs
     $data['full_name'] = sanitizeInput($_POST['full_name'] ?? '');
     $data['email'] = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
@@ -46,7 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
         $maxFileSize = 5 * 1024 * 1024; // 5MB
 
-        if (!in_array($_FILES['id_file']['type'], $allowedTypes)) {
+        $detectedType = (new finfo(FILEINFO_MIME_TYPE))->file($_FILES['id_file']['tmp_name']);
+        if (!in_array($detectedType, $allowedTypes, true)) {
             $errors[] = "Invalid file type. Please upload JPG, PNG, or PDF files only.";
         }
 
@@ -125,18 +119,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userId = $pdo->lastInsertId();
 
             // Handle ID file upload
-            $uploadDir = 'uploads/id_verifications/';
+            $uploadDir = __DIR__ . '/uploads/id_verifications/';
             if (!file_exists($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
+                mkdir($uploadDir, 0750, true);
             }
 
-            $fileExtension = pathinfo($_FILES['id_file']['name'], PATHINFO_EXTENSION);
-            $fileName = 'id_' . $userId . '_' . time() . '.' . $fileExtension;
+            $extensions = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'application/pdf' => 'pdf'];
+            $fileName = 'id_' . $userId . '_' . bin2hex(random_bytes(12)) . '.' . $extensions[$detectedType];
             $filePath = $uploadDir . $fileName;
 
             if (move_uploaded_file($_FILES['id_file']['tmp_name'], $filePath)) {
                 $stmt = $pdo->prepare("INSERT INTO id_verifications (user_id, id_type, id_file_path) VALUES (?, ?, ?)");
-                $stmt->execute([$userId, $data['id_type'], $filePath]);
+                $stmt->execute([$userId, $data['id_type'], 'uploads/id_verifications/' . $fileName]);
             } else {
                 throw new Exception("Failed to upload ID file");
             }
@@ -155,15 +149,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register - SecureBank</title>
+    <title>Open an account | Valtoria Bank</title>
     <link rel="stylesheet" href="./assets/css/register.css">
+    <link rel="stylesheet" href="./assets/css/valtoria.css">
 </head>
 <body>
 
 <div class="wrapper">
             <div class="left-panel">
                 <div>
-                <img src="./assets/images/Logo.png" alt="Nexus Logo" class="logo" />
+                <span class="valtoria-wordmark">Valtoria Bank</span>
                 </div>
                 <div class="handshake-container">
                     <img src="./assets/images/handshake.png" alt="Handshake" class="handshake" />
@@ -172,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="content">
                 <h2 class="headline">Partnership for<br>Business Growth</h2>
                 <p class="description">
-                Welcome to Nexus Bank System, your trusted partner in secure and efficient banking solutions.
+                A clear, secure way to manage cards, transfers, and eligible credit products.
                 </p>
             </div>
             </div>
@@ -195,6 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php endif; ?>
 
                         <form method="POST" id="registrationForm" enctype="multipart/form-data">
+            <?= csrfField() ?>
             <div class="form-group">
                 <div class="form-field">
                 <input type="text" name="full_name" required placeholder="" value="<?= htmlspecialchars($data['full_name']) ?>">

@@ -193,7 +193,7 @@ $weeklyTransfers = $stmt->fetchColumn() ?: 0;
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SecureBank - Transfer Funds</title>
+    <title>Transfer funds | Valtoria Bank</title>
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/css/transfer.css">
 

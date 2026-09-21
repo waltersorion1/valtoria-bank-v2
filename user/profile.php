@@ -124,18 +124,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $userData = $userStmt->fetch();
                             
                             if ($userData) {
-                                $emailSubject = "Password Change Alert - Nexus Bank";
+                                $emailSubject = "Password change alert - Valtoria Bank";
                                 $emailMessage = "
                                     <html>
                                     <body>
                                         <h2>Password Change Notification</h2>
                                         <p>Dear " . htmlspecialchars($userData['full_name']) . ",</p>
-                                        <p>Your password was recently changed on your Nexus Bank account.</p>
+                                        <p>Your password was recently changed on your Valtoria Bank account.</p>
                                         <p>If you did not make this change, please contact our support team immediately or reply to this email.</p>
                                         <p>Time of change: " . date('Y-m-d H:i:s') . "</p>
                                         <br>
                                         <p>Best regards,</p>
-                                        <p>Nexus Bank Security Team</p>
+                                        <p>Valtoria Bank Security Team</p>
                                     </body>
                                     </html>
                                 ";
@@ -252,7 +252,7 @@ $profilePic = (!empty($user['profile_picture']) && file_exists('../uploads/' . $
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Bank - Profile</title>
+    <title>Profile and security | Valtoria Bank</title>
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/css/profile.css">
 

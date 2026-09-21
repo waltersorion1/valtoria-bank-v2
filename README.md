@@ -1,83 +1,71 @@
-# Nexus Bank System
+# Valtoria Bank
 
-![PHP](https://img.shields.io/badge/PHP-8.0+-777BB4?logo=php&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?logo=javascript&logoColor=black)
-![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
-![Status](https://img.shields.io/badge/Status-Active-success)
-![Made with Love](https://img.shields.io/badge/Made%20with-%F0%9F%92%9B-pink)
+Valtoria Bank is a staged modernization of the cloned Nexus PHP/MySQL project into a card-focused financial platform. Module 1 establishes the secure configuration, authentication, documentation, visual system, and public/customer/admin foundations. Legacy financial behavior remains present while it is prepared for the cents-based ledger refactor in Module 2.
 
-**Nexus Bank System** is a secure, web-based digital banking platform with integrated **loans, investments, and user management** features.  
-It provides both **clients** and **administrators** with tools for managing financial accounts, transactions, and security—designed for performance, scalability, and data protection.
+This repository does not claim a banking charter, deposit insurance, regulatory approval, PCI compliance, or endorsement by Visa or Mastercard.
 
----
+## Requirements
 
-## 🚀 Features
+- PHP 8.0+ with PDO MySQL, Fileinfo, OpenSSL, and Mbstring
+- MySQL 8+ or a compatible MariaDB release
+- Apache (XAMPP is supported for local development)
+- Composer dependencies installed (`PHPMailer` and `TCPDF`)
 
-### 🔹 For Users
-- Create and manage bank accounts
-- Deposit, withdraw, and transfer funds
-- View transaction history with downloadable PDF receipts
-- Apply for loans and track approval status
-- Invest in available investment plans and monitor maturity dates
-- Receive OTP and email confirmation for secure logins and transactions
-- Manage profile and account security settings
+## Local installation
 
-### 🔹 For Administrators
-- Manage users, accounts, loans, and investments
-- Approve or reject loan applications
-- Create and manage investment plans
-- View system-wide transaction reports
-- Monitor login records and detect suspicious activity
-- Role-based access control for enhanced security
+1. Clone the repository into the web root.
+2. Copy `.env.example` to `.env` and set local database/application values.
+3. Import a scrubbed legacy schema if starting from an empty database.
+4. Back up the database and apply `database/migrations/001_module1_foundation.sql`.
+5. Run `composer install` when `vendor/` is absent.
+6. Point Apache at the project and visit the `APP_URL` value.
 
----
+Do not use the committed legacy SQL sample data in a public environment. It contains realistic personal records.
 
-## 🛠️ Tech Stack
+## Environment
 
-**Frontend:**
-- HTML5  
-- CSS3 (Flexbox, CSS Grid, Responsive Design with Media Queries)  
-- JavaScript (ES6+, jQuery, ApexCharts.js for interactive charts)
+The main settings are `APP_ENV`, `APP_DEBUG`, `APP_URL`, `APP_TIMEZONE`, `SESSION_NAME`, `SESSION_IDLE_TIMEOUT`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD`.
 
-**Backend:**
-- PHP 8.0+ (PDO, prepared statements, session handling)
-- MySQL 8.0 (Normalized to 3NF, indexed for performance)
+Keep `APP_DEBUG=false` outside local development. Use a least-privilege database account rather than `root` in shared or production environments.
 
-**Tools & Platforms:**
-- Visual Studio Code
-- XAMPP / WAMP (local development)
-- Git & GitHub (version control)
-- Hostinger (deployment)
-- PHPMailer (OTP, email verification)
-- Adobe Photoshop / Illustrator, Canva (UI design assets)
+## Email
 
----
+Email is disabled by default. Configure `MAIL_ENABLED`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_ENCRYPTION`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`, and `SUPPORT_EMAIL` in `.env`. Never commit credentials. Previously committed SMTP credentials must be revoked and removed from repository history.
 
-## 🔒 Security Highlights
-- **One-Time Password (OTP)** authentication (6-digit code, 5-minute expiry)
-- **Password hashing** with bcrypt
-- **Session-based access control** with inactivity timeouts
-- **IP and device tracking** for anomaly detection
-- **Rate limiting** on failed login attempts
-- **SQL injection prevention** with prepared statements
-- **Two-step loan identity verification** (ID upload + selfie verification)
+## Database and migrations
 
----
+See [DATABASE.md](DATABASE.md). Migrations are forward-only SQL files and should be applied once after a verified backup. Module 1 intentionally does not alter financial amount representation.
 
-## 📊 Database Overview
-- **Core Tables:** `users`, `accounts`, `transactions`, `loans`, `investments`, `login_records`, `otp_verification`
-- **Entity Relationships:** Proper foreign key constraints for referential integrity
-- **Indexes:** Primary, foreign, unique, and composite indexes for fast queries
-- **Normalization:** Fully normalized to **Third Normal Form (3NF)**
+## Provider and sandbox configuration
 
----
+No live card payment, transfer rail, KYC provider, or credit bureau is configured. Existing deposits are legacy simulated behavior and must not be represented as real external charges. Provider interfaces and sandbox adapters are Module 2 work after explicit approval.
 
-## 📥 Installation & Setup
+## Assets
 
-### 1️⃣ Clone Repository
-```bash
-git clone https://github.com/PaulPaolo2929/Nexus-Banksystem.git
+See [ASSETS.md](ASSETS.md) for exact target paths, formats, dimensions, variants, and fallbacks. The new public shell uses a CSS wordmark until final Valtoria assets are supplied.
 
-https://nexusbank.ccs-octa.com/login.php
-https://nexusbank.ccs-octa.com/services.php
+## Admin setup
+
+The legacy `is_admin` field is retained for compatibility. The Module 1 migration adds a transitional `role` field and maps current administrators to `super_admin`. Do not grant roles by editing query parameters or exposing database tools publicly.
+
+## Testing
+
+There is no inherited automated test framework. Before each deployment:
+
+```powershell
+Get-ChildItem -Recurse -Filter *.php | Where-Object { $_.FullName -notmatch '\\vendor\\' } | ForEach-Object { C:\xampp\php\php.exe -l $_.FullName }
+C:\xampp\php\php.exe -r "require 'includes/bootstrap.php'; echo config('app.name');"
+```
+
+Also manually verify registration, login/OTP, logout, password reset, customer/admin authorization, CSRF rejection, uploads, and core page rendering against a disposable database.
+
+## Deployment notes
+
+- Serve over HTTPS and set `APP_DEBUG=false`.
+- Keep `.env`, logs, database dumps, and customer uploads out of the public document root.
+- Remove sample/personal data before deployment.
+- Configure web-server upload execution denial (the included `.htaccess` applies to Apache).
+- Rotate exposed historical credentials and rewrite Git history in coordination with collaborators.
+- Back up and test migrations before applying them.
+
+Further detail is in [PROJECT_AUDIT.md](PROJECT_AUDIT.md), [ARCHITECTURE.md](ARCHITECTURE.md), and [SECURITY.md](SECURITY.md).

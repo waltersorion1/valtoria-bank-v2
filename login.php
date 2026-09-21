@@ -1,11 +1,4 @@
 <?php
-// Enable error reporting
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
-
-session_start();
-
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/otp.php';
@@ -26,13 +19,14 @@ if (isset($_GET['error'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireCsrf();
     // Sanitize and normalize email
     $email = strtolower(trim(filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL)));
     $password = $_POST['password'] ?? '';
 
     try {
         // Clear any existing session data
-        session_unset();
+        foreach (['user_id', 'is_admin', 'role', 'temp_user_id', 'temp_is_admin'] as $key) { unset($_SESSION[$key]); }
 
         // Fetch user row (including new columns: login_attempts, blocked_until)
         $stmt = $pdo->prepare("
@@ -219,14 +213,15 @@ render_form:
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Nexus Bank - Login</title>
+  <title>Sign in | Valtoria Bank</title>
+  <link rel="stylesheet" href="./assets/css/valtoria.css">
   <link rel="stylesheet" href="./assets/css/login.css">
 </head>
 <body>
   <div class="wrapper">
     <div class="left-panel">
       <div>
-        <img src="./assets/images/Logo.png" alt="Nexus Logo" class="logo" />
+        <span class="valtoria-wordmark">Valtoria Bank</span>
       </div>
       <div class="handshake-container">
         <img src="./assets/images/handshake.png" alt="Handshake" class="handshake" />
@@ -234,7 +229,7 @@ render_form:
       <div class="content">
         <h2 class="headline">Partnership for<br>Business Growth</h2>
         <p class="description">
-          Welcome to Nexus Bank System, your trusted partner in secure and efficient banking solutions.
+          Secure access to your Valtoria account, cards, and transaction activity.
         </p>
       </div>
     </div>
@@ -249,6 +244,7 @@ render_form:
         <?php endif; ?>
 
         <form method="POST">
+          <?= csrfField() ?>
           <div class="form-group">
             <label>Email</label>
             <input type="email" name="email" required>

@@ -46,10 +46,10 @@ if (isset($_GET['accept']) && is_numeric($_GET['accept'])) {
             $email = $user['email'];
             $name = $user['full_name'];
 
-            $subject = "Your Nexus Bank Account Has Been Approved";
+            $subject = "Your Valtoria Bank account has been approved";
             $body = "<p>Hi <strong>$name</strong>,</p>
-                     <p>Your Nexus Bank account has been <strong>approved</strong> and is now active. You can now log in and use our services.</p>
-                     <p>Thank you for joining Nexus Bank!</p>";
+                     <p>Your Valtoria Bank account has been <strong>approved</strong> and is now active. You can now sign in.</p>
+                     <p>Thank you for choosing Valtoria Bank.</p>";
 
             sendNotification($email, $subject, $body);
         }
@@ -103,9 +103,9 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
         $email = $account['email'];
         $name = $account['full_name'];
 
-        $subject = "Your Nexus Bank Account Has Been Deleted";
+        $subject = "Your Valtoria Bank account has been deleted";
         $body = "<p>Hi <strong>$name</strong>,</p>
-                 <p>Your Nexus Bank account has been <strong>deleted</strong> by an administrator. All associated data has been removed from our system.</p>
+                 <p>Your Valtoria Bank account has been <strong>deleted</strong> by an administrator.</p>
                  <p>If you believe this is a mistake, please contact our support team immediately.</p>";
 
         sendNotification($email, $subject, $body);
@@ -139,9 +139,9 @@ if (isset($_GET['toggle_active']) && is_numeric($_GET['toggle_active'])) {
             $name = $user['full_name'];
             $statusText = $newStatus ? 'activated' : 'deactivated';
 
-            $subject = "Your Nexus Bank Account Has Been $statusText";
+            $subject = "Your Valtoria Bank account has been $statusText";
             $body = "<p>Hi <strong>$name</strong>,</p>
-                     <p>Your Nexus Bank account has been <strong>$statusText</strong> by an administrator.</p>
+                     <p>Your Valtoria Bank account has been <strong>$statusText</strong> by an administrator.</p>
                      <p>If you have any concerns, please contact support.</p>";
 
             sendNotification($email, $subject, $body);
@@ -180,7 +180,7 @@ $users = $users->fetchAll();
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Nexus Bank - Manage Users</title>
+    <title>Customer operations | Valtoria Bank</title>
     <link rel="stylesheet" href="../assets/css/admin-main.css">
     <link rel="stylesheet" href="../assets/css/admin-users.css">
 
