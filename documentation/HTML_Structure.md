@@ -31,7 +31,7 @@ While the `<main>` tag is not explicitly used, the main content is effectively s
 
 Accessibility considerations are integrated into the HTML structure across all pages to improve usability for all users, including those using assistive technologies:
 
-- **Alt Text**: The logo image (`<img src="assets/images/Logo-color-1.png" alt="Nexus Bank Logo" />`) includes descriptive alt text, ensuring screen readers can convey the branding.
+- **Alt Text**: The logo image (`<img src="assets/images/logo.png" alt="Valtoria Bank logo" />`) includes descriptive alt text, ensuring screen readers can convey the branding.
 - **ARIA Attributes**: The hamburger menu button includes `aria-label="Toggle menu"`, `role="button"`, and `tabindex="0"` attributes. These provide semantic meaning and keyboard accessibility, allowing users to toggle the navigation menu via keyboard or screen readers.
 - **Heading Hierarchy**: The pages use a clear and logical heading structure:
   - `<h1>` for the main page title or hero title (e.g., "Where Money Meets Trust", "About Us", "Contact Us", "Our Services").

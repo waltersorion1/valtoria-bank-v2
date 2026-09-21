@@ -78,8 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Apply for a Valtoria Bank account through a clear, secure onboarding process.">
   <title>Open an account | Valtoria Bank</title>
+  <link rel="icon" href="assets/images/brand/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/valtoria.css">
   <link rel="stylesheet" href="assets/css/register.css">
+  <link rel="stylesheet" href="assets/css/brand-assets.css">
 </head>
 <body class="onboarding-page">
 <a class="skip-link" href="#registration">Skip to application</a>

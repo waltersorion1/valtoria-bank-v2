@@ -10,22 +10,22 @@ The application currently uses CSS compositions and text fallbacks, so missing m
 
 | Status | Exact project path | Recommended specification | Intended use | Variant / fallback |
 |---|---|---|---|---|
-| Missing | `assets/images/brand/logo.svg` | SVG, horizontal, approximately 180×40, transparent | Public header and light application surfaces | CSS V mark and “Valtoria Bank” text remain the fallback |
-| Missing | `assets/images/brand/logo-light.svg` | SVG, horizontal, approximately 180×40, transparent | Navy footer and customer/admin sidebars | White text/CSS mark fallback |
-| Missing | `assets/images/brand/logo-mark.svg` | SVG, square viewBox, simple at 24–48 px | Mobile header, compact navigation, loading states | CSS V mark fallback |
+| Available | `assets/images/logo.png` | PNG, 1672×941, transparent horizontal artwork | Public header and light authentication surfaces | Text/CSS fallback if unavailable |
+| Available | `assets/images/logo-light.png` | PNG, 1672×941, transparent horizontal artwork | Navy footer, customer/admin sidebars, authentication story panels | White text/CSS fallback if unavailable |
+| Available | `assets/images/logo-mark.png` | PNG, 1254×1254, transparent square artwork | Compact marks, receipts, and component fallbacks | CSS V mark fallback |
 | Missing | `assets/images/brand/favicon.ico` | ICO containing 16×16, 32×32, and 48×48 | Browser tabs and bookmarks | Browser default icon |
-| Missing | `assets/images/brand/favicon.svg` | SVG, square | Modern-browser favicon | `favicon.ico` fallback |
+| Available | `assets/images/brand/favicon.svg` | SVG, 1080×1080 | Modern-browser favicon across public, authentication, customer, and admin pages | `favicon.ico` fallback when later supplied |
 | Missing | `assets/images/brand/apple-touch-icon.png` | PNG, 180×180 | iOS home-screen bookmark | No touch icon |
 | Missing | `assets/images/brand/social-share.png` | PNG or WebP, 1200×630 | Open Graph/social preview | Text-only link preview |
 
-The inherited files `assets/images/Logo.png`, `Logo-color.png`, `Logo-color-1.png`, and `LOGO-RECEIPT.jpg` are legacy raster logos. Do not overwrite them unless legacy pages have first been migrated to the paths above.
+The inherited `Logo-color.png`, `Logo-color-1.png`, and `LOGO-RECEIPT.jpg` files are legacy raster logos. Active branding now uses the lowercase PNG paths above; remove remaining legacy files only after confirming no retired template still depends on them.
 
 ## Required marketing imagery
 
 | Priority | Exact project path | Recommended specification | Page / placement | Art direction and fallback |
 |---|---|---|---|---|
-| High | `assets/images/marketing/home-hero.webp` | WebP, 1600×1200, 4:3, ≤300 KB | Home-page hero | Premium card/account workspace scene with clear negative space; current CSS card composition remains the fallback |
-| Medium | `assets/images/marketing/accounts-hero.webp` | WebP, 1600×1000, 8:5, ≤260 KB | Accounts hero/supporting panel | Calm dashboard/account overview without real customer data; text-and-proof panel fallback |
+| Available / in use | `assets/images/marketing/home-hero.webp` | WebP, 1600×1200, 4:3, ≤300 KB | Home-page hero | Premium card/account workspace scene with clear negative space |
+| Available / in use | `assets/images/marketing/accounts-hero.webp` | WebP, 1600×1000, 8:5, ≤260 KB | Accounts hero/supporting panel | Calm dashboard/account overview without real customer data |
 | High | `assets/images/marketing/cards-hero.webp` | WebP, 1600×1000, 8:5, ≤260 KB | Cards page | Unbranded partner-card arrangement; no readable PAN or security code; proof panel fallback |
 | High | `assets/images/marketing/transfers-hero.webp` | WebP, 1600×1000, 8:5, ≤260 KB | Transfers page | Abstract person-to-person movement or connected accounts; proof panel fallback |
 | High | `assets/images/marketing/funding-hero.webp` | WebP, 1600×1000, 8:5, ≤260 KB | Card Funding page | Compatible-card funding concept without third-party endorsement; proof panel fallback |

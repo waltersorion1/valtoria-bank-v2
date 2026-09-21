@@ -43,12 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html>
-<head><title>Reset Password</title>
+<head><title>Reset Password</title><link rel="icon" href="assets/images/brand/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="./assets/css/reset-password.css">
 </head>
 <body>
   <div class="reset-page">
-    <img src="./assets/images/Logo.png" alt="Nexus Logo" class="otp-logo">
+    <img src="assets/images/logo.png" alt="Valtoria Bank" class="otp-logo">
     <div class="reset-card">
       <h2 class="reset-title">Reset Your Password</h2>
       <p class="reset-desc">Choose a strong and secure password you haven't used before.</p>

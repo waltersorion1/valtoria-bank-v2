@@ -450,7 +450,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <aside>
                         
-            <img src="../assets/images/Logo-color.png" alt="SecureBank Logo" class="logo-container">
+            <img src="../assets/images/logo.png" alt="Valtoria Bank" class="logo-container">
 
             <nav>
                     <a href="dashboard.php" class="btn">

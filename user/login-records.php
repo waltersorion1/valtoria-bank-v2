@@ -83,6 +83,7 @@ $profilePic = (!empty($user['profile_picture']) && file_exists('../uploads/' . $
 <head>
     <meta charset="UTF-8" />
     <title>Your Login History</title>
+    <link rel="icon" href="../assets/images/brand/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="../assets/css/login-rec.css" />
    <script src="../assets/js/sidebar.js"></script>
 
@@ -91,7 +92,7 @@ $profilePic = (!empty($user['profile_picture']) && file_exists('../uploads/' . $
 <div class="wrapper">
    <aside class="sidebar">
             <div class="Logos-cont">
-                <img src="../assets/images/Logo-color.png" alt="SecureBank Logo" class="logo-container">
+                <img src="../assets/images/logo.png" alt="Valtoria Bank" class="logo-container">
             </div>
             <hr>
             <div class="profile-container">

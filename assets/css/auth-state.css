@@ -1,1 +1,1 @@
-body.authenticated a[href="login"],body.authenticated a[href="login.php"],body.authenticated a[href="register"],body.authenticated a[href="register.php"]{display:none!important}
+@import url('./brand-assets.css');body.authenticated a[href="login"],body.authenticated a[href="login.php"],body.authenticated a[href="register"],body.authenticated a[href="register.php"]{display:none!important}

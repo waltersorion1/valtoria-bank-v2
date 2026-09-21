@@ -21,7 +21,7 @@ $pdf->SetTextColor(52, 60, 106);  // #343C6A - Dark blue
 $pdf->SetFont('dejavusans', '', 12, '', true);
 
 // Add logo (if you have one)
-// $pdf->Image('../assets/images/Logo-color.png', 20, 20, 40);
+// $pdf->Image('../assets/images/logo.png', 20, 20, 40);
 
 // Add decorative line
 $pdf->SetLineWidth(0.5);
@@ -58,7 +58,7 @@ $pdf->AddPage();
 $pdf->SetFont('dejavusans', '', 12, '', true);
 
 // Add logo
-$logoFile = '../assets/images/Logo-color.png';
+$logoFile = '../assets/images/logo.png';
 if (file_exists($logoFile)) {
     $pdf->Image($logoFile, 20, 15, 30);
 }

@@ -74,8 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Securely sign in to your Valtoria Bank account.">
   <title>Sign in | Valtoria Bank</title>
+  <link rel="icon" href="assets/images/brand/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/valtoria.css">
   <link rel="stylesheet" href="assets/css/login.css">
+  <link rel="stylesheet" href="assets/css/brand-assets.css">
 </head>
 <body class="signin-page">
 <a class="skip-link" href="#signin-form">Skip to sign in</a>

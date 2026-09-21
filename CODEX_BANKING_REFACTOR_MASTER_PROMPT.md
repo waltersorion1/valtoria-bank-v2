@@ -1116,9 +1116,9 @@ Instead, inspect the project and create/update a root-level `ASSETS.md` telling 
 Use a clean convention such as:
 
 ```text
-/public/assets/images/brand/logo.svg
-/public/assets/images/brand/logo-light.svg
-/public/assets/images/brand/logo-mark.svg
+/assets/images/logo.png
+/assets/images/logo-light.png
+/assets/images/logo-mark.png
 /public/assets/images/brand/favicon.ico
 /public/assets/images/brand/apple-touch-icon.png
 /public/assets/images/marketing/home-hero.webp

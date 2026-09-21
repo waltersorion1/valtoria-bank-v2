@@ -15,6 +15,7 @@ if (isset($_GET['timeout']) && $_GET['timeout'] == 1) {
     <head>
         <meta charset="UTF-8">
         <title>Session Timeout</title>
+        <link rel="icon" href="assets/images/brand/favicon.svg" type="image/svg+xml">
         <script>
             alert("Your session has timed out due to inactivity. You will be redirected to the login page.");
             window.location.href = "login.php";

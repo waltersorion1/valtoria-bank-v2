@@ -37,12 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!-- HTML Form -->
 <!DOCTYPE html>
 <html>
-<head><title>Forgot Password</title>
+<head><title>Forgot Password</title><link rel="icon" href="assets/images/brand/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="./assets/css/forgot-password.css">
 </head>
 <body>
   <div class="forgot-page">
-     <img src="./assets/images/Logo.png" alt="Nexus Logo" class="otp-logo">
+     <img src="assets/images/logo.png" alt="Valtoria Bank" class="otp-logo">
     <div class="forgot-card">
      
       <h2 class="forgot-title">Reset Your Password</h2>

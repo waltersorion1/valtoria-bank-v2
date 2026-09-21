@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verification | Valtoria Bank</title><link rel="stylesheet" href="assets/css/valtoria.css"><link rel="stylesheet" href="assets/css/otp.css"></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verification | Valtoria Bank</title><link rel="icon" href="assets/images/brand/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/css/valtoria.css"><link rel="stylesheet" href="assets/css/brand-assets.css"><link rel="stylesheet" href="assets/css/otp.css"></head><body>
 <main class="container" style="max-width:520px;padding-top:70px"><section class="content-card"><span class="valtoria-wordmark">Valtoria Bank</span><h1>Verify your sign-in</h1><p class="muted">Enter the six-digit code sent to your email. It expires in five minutes.</p>
 <?php if ($notice): ?><div class="notice success"><?= e($notice) ?></div><?php endif; ?><?php if ($error): ?><div class="notice error" role="alert"><?= e($error) ?></div><?php endif; ?>
 <form method="post"><?= csrfField() ?><div class="field full" style="margin:20px 0"><label for="otp">Verification code</label><input id="otp" name="otp" inputmode="numeric" pattern="\d{6}" maxlength="6" autocomplete="one-time-code" required></div><button class="button button-primary">Verify sign-in</button></form>

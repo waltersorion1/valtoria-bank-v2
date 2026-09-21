@@ -1,0 +1,35 @@
+.public-menu-toggle {
+    display: none;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    padding: 10px;
+    border: 1px solid var(--valtoria-border);
+    border-radius: 11px;
+    background: #fff;
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+.public-menu-toggle span { display: block; width: 21px; height: 2px; border-radius: 2px; background: var(--valtoria-navy); }
+.public-menu-scrim { position: fixed; inset: 0; z-index: 89; background: rgba(8,20,38,.52); opacity: 0; transition: opacity .22s ease; }
+.public-menu-scrim:not([hidden]) { display: block; }
+.public-mobile-menu { position: fixed; z-index: 90; top: 0; right: 0; width: min(88vw,360px); height: 100dvh; padding: 20px; background: #fff; box-shadow: -18px 0 50px rgba(8,20,38,.2); transform: translateX(105%); visibility: hidden; transition: transform .25s ease,visibility .25s; }
+.public-mobile-menu__head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; border-bottom: 1px solid var(--valtoria-border); }
+.public-mobile-menu__head img { display: block; width: 154px; height: 46px; object-fit: contain; }
+.public-menu-close { display: grid; place-items: center; width: 42px; height: 42px; border: 0; border-radius: 10px; background: #f2f4f7; color: var(--valtoria-navy); font-size: 1.8rem; line-height: 1; cursor: pointer; }
+.public-mobile-menu nav { display: grid; padding: 18px 0; }
+.public-mobile-menu nav a { padding: 12px 10px; border-radius: 9px; color: #344054; font-weight: 700; }
+.public-mobile-menu nav a:hover { background: #f2f4f7; color: var(--valtoria-blue); }
+.public-mobile-menu__actions { display: grid; gap: 10px; padding-top: 18px; border-top: 1px solid var(--valtoria-border); }
+body.public-menu-open { overflow: hidden; }
+body.public-menu-open .public-menu-scrim { opacity: 1; }
+body.public-menu-open .public-mobile-menu { transform: translateX(0); visibility: visible; }
+@media (max-width:850px) {
+    .site-nav > .nav-actions { display: none; }
+    .public-menu-toggle { display: flex !important; margin-left: auto; }
+}
+@media (min-width:851px) { .public-menu-scrim, .public-mobile-menu { display: none !important; } }
+@media (prefers-reduced-motion:reduce) { .public-menu-scrim, .public-mobile-menu { transition: none; } }

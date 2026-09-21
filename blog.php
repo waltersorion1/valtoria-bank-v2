@@ -14,6 +14,7 @@ if (isLoggedIn()) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Why Valtoria | Valtoria Bank</title>
+  <link rel="icon" href="assets/images/brand/favicon.svg" type="image/svg+xml">
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -251,7 +252,7 @@ if (isLoggedIn()) {
   <header>
     <nav>
       <a href="index.php" class="logo">
-        <img src="assets/images/Logo-color-1.png" alt="Valtoria Bank logo" />
+        <img src="assets/images/logo.png" alt="Valtoria Bank logo" />
         Valtoria Bank
       </a>
       <div class="nav-links">
